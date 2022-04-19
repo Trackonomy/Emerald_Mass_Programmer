@@ -9,10 +9,11 @@ import inquirer
 from multiprocessing import Process, Manager
 from subprocess import Popen
 
-macids = []
-qrCodes = []
-macqrpairs = {}
-flashed = False
+macids = [] ## initialize macid list
+qrCodes = [] ## initialize qr codes list
+macqrpairs = {} ## initialize mac qr pair dict
+flashed = False ## initialize DFU status
+fw = '' ## fw to be flash
 
 def scanQRcodes():
     global macids, qrCodes, macqrpairs
@@ -73,49 +74,50 @@ def getKeysByValue(dictOfElements, valueToFind):
 # ======================================================================================================================
 
 def change_mac(mac, offset):
-    return "{:012X}".format(int(mac, 16) + offset)
+    return "{:012X}".format(int(mac, 16) + offset) ## function to increment macid by 1 in HEX
 
 # This handles macid, flash bootloader, and the first DFU for emerald boards
-def parallelDfu(chx, zipf, com, macAddy,active=True):
+def parallelDfu(chx, zipf, com, macAddy,active=True): ## function to call DFU command (channel, zip file, com port, mac address, run status)
     if active == True: #this is here to allow us an easy way of turning off a channel for testing
 
-        for i in range(1):
+        for i in range(5):
             print("firing: ", i)
             try:
-                os_cmd = 'nrfutil dfu ble -ic NRF52 -pkg ' + zipf + ' -p ' + com + ' -a ' + macAddy + ' -f -mtu 200'
+                os_cmd = 'nrfutil dfu ble -ic NRF52 -pkg ' + zipf + ' -p ' + com + ' -a ' + macAddy + ' -f -mtu 200' ## command to DFU by macid
                 if os.system(os_cmd) != 0:
                     if i == 4:
-                        raise Exception('Ch' + str(chx) + ' error ')
+                        raise Exception('Ch' + str(chx) + ' error ') ## error if DFU is not successful after 4 attempts
                 else:
                     break
             except:
                 print("#####An exception occurred with Ch " + str(chx))
+            # print('========================= ' + change(macAddy, -1) + ' Passes =========================')
 
 def runDFU():
-    global flashed
+    global flashed, fw
 
-    com = ['COM9','COM10','COM12','COM13','COM14','COM15','COM16','COM18','COM19','COM20']
+    com = ['COM9','COM10','COM12','COM13','COM14','COM15','COM16','COM18','COM19','COM20'] ## com ports for NRF52-DK
     # com = ['COM9','COM12','COM18','COM19','COM20']
-    DFU_processes = {}
-    fw = 'Em61x_MHM_LoRaWAN_V2.0.1_Final.zip'
-    # fw = 'Bat_Test.zip'
+    DFU_processes = {} ## initialize dict to create DFU process based on # of qrCodes scanned
+    # fw = 'Em61x_MHM_LoRaWAN_V2.0.1_Final.zip' ## final fw
+    fw = 'Bat_Test.zip' ## low batt fw
     for p in range(len(macids)):
-        DFU_processes["p{0}".format(p)] = multiprocessing.Process(name="p{0}".format(p), target=parallelDfu, args=(p+1, fw, com[p], macAddyincr[p], True))
+        DFU_processes["p{0}".format(p)] = multiprocessing.Process(name="p{0}".format(p), target=parallelDfu, args=(p+1, fw, com[p], macAddyincr[p], True)) ## create variables for multiprocessing based on len of macid
         (DFU_processes["p{0}".format(p)]).daemon = True
         (DFU_processes["p{0}".format(p)]).start()
     for o in range(len(macids)):
         (DFU_processes["p{0}".format(o)]).join()
 
-    flashed = True
+    flashed = True ## finished flashing
     return flashed
 ####################################################################################################################################################################
 ####################################################################################################################################################################
 ####################################################################################################################################################################
 def sendToArduino(sendStr):
-    ser.write(bytes(sendStr, 'utf-8'))
+    ser.write(bytes(sendStr, 'utf-8')) ## function to communicate with arduino
 
 
-def run(start,finish,delaytime):
+def run(start,finish,delaytime): ## status for emags turning on and off triggered by Arduino (0, number of nodes, time emag is on)
 
     print("-----------------------------")
     for l in range(start,finish):
@@ -141,13 +143,13 @@ def run(start,finish,delaytime):
 if __name__ == '__main__':
     counter = 1
     while True:
-        macAddyincr = []
-        scanQRcodes()
+        macAddyincr = [] ## macid hex increment initializer
+        scanQRcodes() #function to validate then append qr codes to list
         for x in macids:
-            macAddyincr.append(change_mac(x, 1))
+            macAddyincr.append(change_mac(x, 1)) ## increment macids by 1 in HEX
         # print(macids)
         # print(macAddyincr)
-        startTime = time.time()
+        startTime = time.time() ## test start time
 
         os.system("cls")
         print("/=======================================\\")
@@ -156,42 +158,42 @@ if __name__ == '__main__':
         print("| 22/04/15 v1.0.0, TG |")
         print("\\=====================/")
         print("")
-        numNodes = 10
+        numNodes = 10 ## number of magnets turning on
 
-        serPort = "COM17"
-        baudRate = 9600
+        serPort = "COM17" ## Serial port where arduino is connect
+        baudRate = 9600 ## set baud rate
         ser = serial.Serial(serPort, baudRate)
         print("Serial port " + serPort + " opened  Baudrate " + str(baudRate))
 
-        time.sleep(2)
+        time.sleep(2) ## delay to get arduino ready
         # sendToArduino(str(len(macids)))
         print('Putting Nodes into DFU mode')
-        sendToArduino(str(1))
-        run(0,numNodes,20)
-        runDFU()
-        x = ser.readline()
+        sendToArduino(str(1)) ## Communicate with arduino to turn emags on
+        run(0,numNodes,20) ## run status of emags on for 20s then off
+        runDFU() ## pass macids obtained from scanned QRs code to nrfutil commands to DFU as multiprocesses
+        x = ser.readline() ##  read data sent from Arduino telling python it's ready for putting devices to sleep
         string_x = x.decode()
-        stripped_string_x = string_x.strip()
-        if stripped_string_x == "1" and flashed == True:
+        stripped_string_x = string_x.strip() ## getting read arduino message into form that can be read as a string
+        if stripped_string_x == "1" and flashed == True: ## If arduino is ready and flashing (DFU) is complete
             print("flashing complete.")
             print('Sleeping Nodes')
-            sendToArduino(str(1))
-            run(0, numNodes, 15)
-            ser.close()
-        endTime = round((time.time() - startTime), 2)
+            sendToArduino(str(1)) ## Communicate with arduino to turn emags on
+            run(0, numNodes, 15) ## run status of emags on for 15s then off
+            ser.close() ## close serial port
+        endTime = round((time.time() - startTime), 2) ## get run time of programming
 
         print(endTime, "seconds elapsed.")
         print("")
-        lines = ["Test # {}".format(counter), '# of Domino(s): {}'.format(len(macids)),'Time taken: {}'.format(endTime),'##################']
-        with open('Logging.txt', 'a') as f:
+        lines = ["Test # {}".format(counter), '# of Domino(s): {}'.format(len(macids)),'Time taken: {}'.format(endTime),'##################','FW: {}'.format(fw)] ## data for loggin
+        with open('Logging.txt', 'a') as f: ## open txt file to write log to
             for line in lines:
-                f.write(line)
+                f.write(line) ## write the data in log file
                 f.write('\n')
         counter = counter + 1
-        macids = []
-        qrCodes = []
-        macqrpairs = {}
-        flashed = False
+        macids = [] ## reset macid list for next test
+        qrCodes = []  ## reset qr codes list for next test
+        macqrpairs = {}  ## reset mac qr pair dict for next test
+        flashed = False ## reset DFU status
         again_q = [
             inquirer.List(
                 "Again",
@@ -200,6 +202,6 @@ if __name__ == '__main__':
                 default=["Y"],
             ),
         ]
-        again_a = inquirer.prompt(again_q)
+        again_a = inquirer.prompt(again_q) ## Ask user if they want to program more dominos
         if again_a['Again'] == "N":
             break
