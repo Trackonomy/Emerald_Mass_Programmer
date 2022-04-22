@@ -26,6 +26,7 @@ void loop() {
     Serial.println(1);
     char z = Serial.read();
     if (z == '1'){
+      delay(10000)
       allOff(0);
     }
   }

@@ -186,6 +186,8 @@ if __name__ == '__main__':
             print("flashing complete.")
             print('Sleeping Nodes')
             sendToArduino(str(1)) ## Communicate with arduino to turn emags on
+            # print('Sleeping Nodes')
+            time.sleep(10)
             run("off","off",0,numNodes,0.01,True, False )
             ser.close() ## close serial port
         endTime = round((time.time() - startTime), 2) ## get run time of programming
