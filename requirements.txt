@@ -1,0 +1,8 @@
+requests
+json
+serial
+time
+os
+subprocess
+multiprocessing
+inquirer

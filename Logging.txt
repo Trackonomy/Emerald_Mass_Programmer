@@ -1,0 +1,98 @@
+Test # 1
+# of Domino(s): 10
+Time taken: 98.73
+##################
+Test # 2
+# of Domino(s): 10
+Time taken: 98.1
+##################
+Test # 3
+# of Domino(s): 10
+Time taken: 89.86
+##################
+Test # 4
+# of Domino(s): 10
+Time taken: 94.66
+##################
+Test # 5
+# of Domino(s): 10
+Time taken: 123.27
+##################
+Test # 1
+# of Domino(s): 10
+Time taken: 134.76
+##################
+Test # 1
+# of Domino(s): 10
+Time taken: 158.23
+##################
+Test # 1
+# of Domino(s): 10
+Time taken: 150.22
+##################
+Test # 2
+# of Domino(s): 8
+Time taken: 225.53
+##################
+Test # 3
+# of Domino(s): 4
+Time taken: 196.31
+##################
+Test # 1
+# of Domino(s): 1
+Time taken: 108.15
+##################
+Test # 1
+# of Domino(s): 1
+Time taken: 92.76
+##################
+Test # 1
+# of Domino(s): 2
+Time taken: 101.01
+##################
+FW: Bat_Test.zip
+Test # 1
+# of Domino(s): 1
+Time taken: 50.35
+##################
+FW: Bat_Test.zip
+Test # 1
+# of Domino(s): 10
+Time taken: 114.7
+##################
+FW: Bat_Test.zip
+Test # 2
+# of Domino(s): 10
+Time taken: 161.8
+##################
+FW: Bat_Test.zip
+Test # 1
+# of Domino(s): 3
+Time taken: 100.47
+##################
+FW: Bat_Test.zip
+Test # 1
+# of Domino(s): 10
+Time taken: 164.95
+##################
+FW: Bat_Test.zip
+Test # 1
+# of Domino(s): 1
+Time taken: 141.61
+##################
+FW: Bat_Test.zip
+Test # 1
+# of Domino(s): 2
+Time taken: 139.01
+##################
+FW: Bat_Test.zip
+Test # 1
+# of Domino(s): 2
+Time taken: 100.79
+##################
+FW: Bat_Test.zip
+Test # 1
+# of Domino(s): 1
+Time taken: 89.83
+##################
+FW: Bat_Test.zip
