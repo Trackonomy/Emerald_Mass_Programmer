@@ -67,7 +67,7 @@ def validateQR(qr):
 def getKeysByValue(dictOfElements, valueToFind):
     listOfKeys = list()
     listOfItems = dictOfElements.items()
-    for item  in listOfItems:
+    for item in listOfItems:
         if item[1] == valueToFind:
             listOfKeys.append(item[0])
     return  listOfKeys
@@ -88,10 +88,14 @@ def parallelDfu(chx, zipf, com, macAddy,active=True): ## function to call DFU co
                     if i == 4:
                         raise Exception('Ch' + str(chx) + ' error ') ## error if DFU is not successful after 4 attempts
                 else:
+                    listOfKeys = getKeysByValue(macqrpairs, change_mac(macAddy, -1))
+                    for key in listOfKeys:
+                        # print(key)
+                        passed_qrs.append(key)
+                        print('========================= ' + key + ' Passes =========================')
                     break
             except:
                 print("#####An exception occurred with Ch " + str(chx))
-            # print('========================= ' + change(macAddy, -1) + ' Passes =========================')
 
 def runDFU():
     global flashed, fw
@@ -142,6 +146,8 @@ def run(start,finish,delaytime): ## status for emags turning on and off triggere
 
 if __name__ == '__main__':
     counter = 1
+    passed_qrs = []
+    failed_qrs = []
     while True:
         macAddyincr = [] ## macid hex increment initializer
         scanQRcodes() #function to validate then append qr codes to list
@@ -184,6 +190,8 @@ if __name__ == '__main__':
 
         print(endTime, "seconds elapsed.")
         print("")
+        passed_qrs = listOfKeys
+
         lines = ["Test # {}".format(counter), '# of Domino(s): {}'.format(len(macids)),'Time taken: {}'.format(endTime),'##################','FW: {}'.format(fw)] ## data for loggin
         with open('Logging.txt', 'a') as f: ## open txt file to write log to
             for line in lines:
