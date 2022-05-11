@@ -11,6 +11,7 @@ from subprocess import Popen
 
 macids = [] ## initialize macid list
 qrCodes = [] ## initialize qr codes list
+listOfKeys = list()
 macqrpairs = {} ## initialize mac qr pair dict
 flashed = False ## initialize DFU status
 fw = '' ## fw to be flash
@@ -65,7 +66,6 @@ def validateQR(qr):
     return False
 
 def getKeysByValue(dictOfElements, valueToFind):
-    listOfKeys = list()
     listOfItems = dictOfElements.items()
     for item  in listOfItems:
         if item[1] == valueToFind:
@@ -78,6 +78,7 @@ def change_mac(mac, offset):
 
 # This handles macid, flash bootloader, and the first DFU for emerald boards
 def parallelDfu(chx, zipf, com, macAddy,active=True): ## function to call DFU command (channel, zip file, com port, mac address, run status)
+    global listOfKeys
     if active == True: #this is here to allow us an easy way of turning off a channel for testing
 
         for i in range(5):
@@ -195,10 +196,14 @@ if __name__ == '__main__':
         print(endTime, "seconds elapsed.")
         print("")
         lines = ["Test # {}".format(counter), '# of Domino(s): {}'.format(len(macids)),'Time taken: {}'.format(endTime),'FW: {}'.format(fw),'##################'] ## data for loggin
+        for i in listOfKeys:
+            print('Passed: ' + i)
         with open('Logging.txt', 'a') as f: ## open txt file to write log to
             for line in lines:
                 f.write(line) ## write the data in log file
                 f.write('\n')
+            for i in listOfKeys:
+                f.write('Passed: ' + i)
         counter = counter + 1
         macids = [] ## reset macid list for next test
         qrCodes = []  ## reset qr codes list for next test
