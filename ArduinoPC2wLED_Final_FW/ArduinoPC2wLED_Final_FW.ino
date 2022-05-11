@@ -19,15 +19,29 @@ void setup() {
 
 void loop() {
   if (Serial.available() > 0) {
-    char y = Serial.read();
-    if (y == '1') {
-      allOn(20000,15000,0,0);
-    }
-    Serial.println(1);
-    char z = Serial.read();
-    if (z == '1'){
-      delay(10000);
+    char a = Serial.read();
+    if (a == '1') {
+      allOn(20000,0);
       allOff(0);
+    }
+//    Serial.println(1);
+//    char b = Serial.read();
+//    if (b == '1'){
+//      delay(10000);
+//      allOff(0);
+//    }
+    char b = Serial.read();
+    if(b == '1'){
+      for (int x=0; x <=3; x++) {
+        allPulse(2000,0,0);
+      }
+      delay(15000);
+      allOn(0,0);
+    }
+    char c = Serial.read();{
+      if(c == '1'){
+        allOff(0);
+      }
     }
   }
 }
@@ -36,7 +50,7 @@ void loop() {
 //=============
 
 
-void allOn(int delay_time,int midDFU_delay,int current, int previous) {
+void allOn(int delay_time,int current) {
   //  if(millis() >= next){
   for (current; current<10; current++){
     ledChip.SetChannelPWM(current, 255); //Turns on LED
@@ -46,21 +60,21 @@ void allOn(int delay_time,int midDFU_delay,int current, int previous) {
     digitalWrite(emags[i], HIGH); //Turns all 10 magnets on
   }
   delay(delay_time); //delay to turn on magnets for atleast 10s to put them into DFU mode
-  for (int i = 0; i <= iter; i++) {
-    digitalWrite(emags[i], LOW);  //Turns all 10 magnets off
-  }
-  digitalWrite(LED_10,LOW);
-  for (previous; previous <= iter; previous++) {
-    ledChip.SetChannelPWM(previous, 0); //Turns off LED
-  }
- delay(midDFU_delay); //delay to allow DFU to complete partially
-  for (current; current<10; current++){
-    ledChip.SetChannelPWM(current, 255); //Turns on LED
-  }
-  digitalWrite(LED_10,HIGH);
-  for (int i = 0; i <= iter; i++) {
-    digitalWrite(emags[i], HIGH); //Turns all 10 magnets on
-  }
+//  for (int i = 0; i <= iter; i++) {
+//    digitalWrite(emags[i], LOW);  //Turns all 10 magnets off
+//  }
+//  digitalWrite(LED_10,LOW);
+//  for (previous; previous <= iter; previous++) {
+//    ledChip.SetChannelPWM(previous, 0); //Turns off LED
+//  }
+// delay(midDFU_delay); //delay to allow DFU to complete partially
+//  for (current; current<10; current++){
+//    ledChip.SetChannelPWM(current, 255); //Turns on LED
+//  }
+//  digitalWrite(LED_10,HIGH);
+//  for (int i = 0; i <= iter; i++) {
+//    digitalWrite(emags[i], HIGH); //Turns all 10 magnets on
+//  }
 //  Serial.println("off");
     //      previous = current;
     //      ledChip.SetChannelPWM(previous, 0); //Turns off LED
@@ -75,6 +89,23 @@ void allOff (int previous){
   for (previous; previous <= iter; previous++) {
     ledChip.SetChannelPWM(previous, 0); //Turns off LED
   }
+}
+
+void allPulse(int delay_time, int current, int previous) {
+  
+  for (current; current<10; current++){
+  ledChip.SetChannelPWM(current, 255); //Turns on LED
+  }
+  digitalWrite(LED_10,HIGH);
+  delay(delay_time); //delay to turn on magnets for atleast 10s to put them into DFU mode
+  for (int i = 0; i <= iter; i++) {
+    digitalWrite(emags[i], LOW);  //Turns all 10 magnets off
+  }
+  digitalWrite(LED_10,LOW);
+  for (previous; previous <= iter; previous++) {
+    ledChip.SetChannelPWM(previous, 0); //Turns off LED
+  }
+  delay(delay_time);   
 }
 //
 //void allOff_1() {

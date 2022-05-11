@@ -102,9 +102,7 @@ def parallelDfu(chx, zipf, com, macAddy,active=True): ## function to call DFU co
 
 def runDFU():
     global flashed, fw
-
-    com = ['COM9','COM10','COM12','COM13','COM14','COM15','COM16','COM18','COM19','COM20'] ## com ports for NRF52-DK
-    # com = ['COM9','COM12','COM18','COM19','COM20']
+    flashed = False
     DFU_processes = {} ## initialize dict to create DFU process based on # of qrCodes scanned
     fw = 'Em61x_MHM_LoRaWAN_V2.0.1_Final.zip' ## final fw
     # fw = 'Bat_Test.zip' ## low batt fw
@@ -126,7 +124,7 @@ def sendToArduino(sendStr):
     ser.write(bytes(sendStr, 'utf-8')) ## function to communicate with arduino
 
 
-def run(on,off,start,finish,delaytime, start_stat = False,stop_stat = False): ## status for emags turning on and off triggered by Arduino (0, number of nodes, time emag is on)
+def run(on,off,start,finish,delaytime,start_stat=False,stop_stat=False): ## status for emags turning on and off triggered by Arduino (0, number of nodes, time emag is on)
     if start_stat:
         print("-----------------------------")
         for l in range(start,finish):
@@ -141,6 +139,22 @@ def run(on,off,start,finish,delaytime, start_stat = False,stop_stat = False): ##
 
 if __name__ == '__main__':
     counter = 1
+
+    facility_q =  [inquirer.List(
+                "Facility",
+                message="Select Facility you are at",
+                choices=["San Jose", "Juarez"],
+                default=["San Jose"],
+            ),
+        ]
+    facility_a = inquirer.prompt(facility_q) ## Ask user if they want to program more dominos
+    if facility_a['Facility'] == "San Jose":
+        com = ['COM9', 'COM10', 'COM12', 'COM13', 'COM14', 'COM15', 'COM16', 'COM18', 'COM19','COM20']  ## com ports for NRF52-DK at SJ
+        serPort = "COM17"  ## Serial port where arduino is connect
+    elif facility_a['Facility'] == "Juarez":
+        com = ['COM3', 'COM4', 'COM5', 'COM7', 'COM8', 'COM9', 'COM10', 'COM11', 'COM12','COM13']  ## com ports for NRF52-DK at SJ
+        serPort = "COM6"  ## Serial port where arduino is connect
+
     while True:
         macAddyincr = [] ## macid hex increment initializer
         scanQRcodes() #function to validate then append qr codes to list
@@ -159,7 +173,6 @@ if __name__ == '__main__':
         print("")
         numNodes = 10 ## number of magnets turning on
 
-        serPort = "COM17" ## Serial port where arduino is connect
         baudRate = 9600 ## set baud rate
         ser = serial.Serial(serPort, baudRate)
         print("Serial port " + serPort + " opened  Baudrate " + str(baudRate))
@@ -168,55 +181,72 @@ if __name__ == '__main__':
         # sendToArduino(str(len(macids)))
         print('Putting Nodes into DFU mode')
         sendToArduino(str(1)) ## Communicate with arduino to turn emags on
-        run("on", "off", 0,numNodes, 20, True,True) ## run status of emags on for 20s then off
+        run("on","off", 0,numNodes, 20, True,True) ## run status of emags on for 20s then off
         runDFU() ## pass macids obtained from scanned QRs code to nrfutil commands to DFU as multiprocesses
 
-        DFUrun = multiprocessing.Process(name="DFUrun", target=runDFU)
-        wake_timer = multiprocessing.Process(name="wake_timer", target=run, args=("on", "on", 0, numNodes, 15, False, True))
-        DFUrun.daemon = True
-        wake_timer.daemon = True
-        DFUrun.start()
-        wake_timer.start()
-        DFUrun.join()
-        wake_timer.join()
+        print('Waiting for System test results........................................................... ')
+        sys_test_complete = input('Please remove failed units and input "q" to continue: ')
 
-        x = ser.readline() ##  read data sent from Arduino telling python it's ready for putting devices to sleep
-        string_x = x.decode()
-        stripped_string_x = string_x.strip() ## getting read arduino message into form that can be read as a string
-        if stripped_string_x == "1" and flashed == True: ## If arduino is ready and flashing (DFU) is complete
-            print("flashing complete.")
-            print('Sleeping Nodes')
-            sendToArduino(str(1)) ## Communicate with arduino to turn emags on
-            # print('Sleeping Nodes')
-            time.sleep(10)
-            run("off","off",0,numNodes,0.01,True, False )
-            ser.close() ## close serial port
-        endTime = round((time.time() - startTime), 2) ## get run time of programming
+        if sys_test_complete == 'q' and flashed:
+            sendToArduino(str(1))
+            for i in range(3):
+                run("on","off",0,numNodes, 2, True,True)
+                time.sleep(2)
 
-        print(endTime, "seconds elapsed.")
-        print("")
-        lines = ["Test # {}".format(counter), '# of Domino(s): {}'.format(len(macids)),'Time taken: {}'.format(endTime),'FW: {}'.format(fw),'##################'] ## data for loggin
-        for i in listOfKeys:
-            print('Passed: ' + i)
-        with open('Logging.txt', 'a') as f: ## open txt file to write log to
-            for line in lines:
-                f.write(line) ## write the data in log file
-                f.write('\n')
+            DFUrun = multiprocessing.Process(name="DFUrun", target=runDFU)
+            wake_timer = multiprocessing.Process(name="wake_timer", target=run, args=("on","off",0, numNodes, 10, False, True))
+            DFUrun.daemon = True
+            wake_timer.daemon = True
+            DFUrun.start()
+            wake_timer.start()
+            DFUrun.join()
+            wake_timer.join()
+            if flashed:
+                print("flashing complete.")
+                print('Sleeping Nodes')
+                time.sleep(10)
+                sendToArduino(str(1))
+                run("off", "off", 0, numNodes, 0, True, False)
+                ser.close()  ## close serial port
+
+
+        # x = ser.readline() ##  read data sent from Arduino telling python it's ready for putting devices to sleep
+        # string_x = x.decode()
+        # stripped_string_x = string_x.strip() ## getting read arduino message into form that can be read as a string
+        # if stripped_string_x == "1" and flashed == True: ## If arduino is ready and flashing (DFU) is complete
+        #     print("flashing complete.")
+        #     print('Sleeping Nodes')
+        #     sendToArduino(str(1)) ## Communicate with arduino to turn emags on
+        #     # print('Sleeping Nodes')
+        #     time.sleep(10)
+        #     run("off","off",0,numNodes,0.01,True, False )
+        #     ser.close() ## close serial port
+            endTime = round((time.time() - startTime), 2) ## get run time of programming
+
+            print(endTime, "seconds elapsed.")
+            print("")
+            lines = ["Test # {}".format(counter), '# of Domino(s): {}'.format(len(macids)),'Time taken: {}'.format(endTime),'FW: {}'.format(fw),'##################'] ## data for loggin
             for i in listOfKeys:
-                f.write('Passed: ' + i)
-        counter = counter + 1
-        macids = [] ## reset macid list for next test
-        qrCodes = []  ## reset qr codes list for next test
-        macqrpairs = {}  ## reset mac qr pair dict for next test
-        flashed = False ## reset DFU status
-        again_q = [
-            inquirer.List(
-                "Again",
-                message="Select Y to run again or N to exit",
-                choices=["Y", "N"],
-                default=["Y"],
-            ),
-        ]
-        again_a = inquirer.prompt(again_q) ## Ask user if they want to program more dominos
-        if again_a['Again'] == "N":
-            break
+                print('Passed: ' + i)
+            with open('Logging.txt', 'a') as f: ## open txt file to write log to
+                for line in lines:
+                    f.write(line) ## write the data in log file
+                    f.write('\n')
+                for i in listOfKeys:
+                    f.write('Passed: ' + i)
+            counter = counter + 1
+            macids = [] ## reset macid list for next test
+            qrCodes = []  ## reset qr codes list for next test
+            macqrpairs = {}  ## reset mac qr pair dict for next test
+            flashed = False ## reset DFU status
+            again_q = [
+                inquirer.List(
+                    "Again",
+                    message="Select Y to run again or N to exit",
+                    choices=["Y", "N"],
+                    default=["Y"],
+                ),
+            ]
+            again_a = inquirer.prompt(again_q) ## Ask user if they want to program more dominos
+            if again_a['Again'] == "N":
+                break
