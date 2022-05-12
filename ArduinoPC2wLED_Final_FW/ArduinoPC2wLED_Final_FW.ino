@@ -36,7 +36,7 @@ void loop() {
         allPulse(2000,0,0);
       }
       delay(10000);
-      allOn(0,0);
+      allOn(1,0);
     }
     char c = Serial.read();{
       if(c == '1'){

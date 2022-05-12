@@ -106,17 +106,19 @@ def runDFU(test_2 = False):
     # fw = 'Bat_Test.zip' ## low batt fw
     wake_timer = multiprocessing.Process(name="wake_timer", target=run,
                                          args=("on", "on", 0, numNodes, 10, False, True))
-    if test_2:
-        wake_timer.daemon = True
-        wake_timer.start()
-        wake_timer.join()
 
     for p in range(len(macids)):
         DFU_processes["p{0}".format(p)] = multiprocessing.Process(name="p{0}".format(p), target=parallelDfu, args=(passedmacs,p+1, fw, com[p], macAddyincr[p], True)) ## create variables for multiprocessing based on len of macid
         (DFU_processes["p{0}".format(p)]).daemon = True
         (DFU_processes["p{0}".format(p)]).start()
+    if test_2:
+        wake_timer.daemon = True
+        wake_timer.start()
+        wake_timer.join()
     for o in range(len(macids)):
         (DFU_processes["p{0}".format(o)]).join()
+    if test_2:
+        wake_timer.join()
 
 
     flashed = True ## finished flashing
@@ -193,7 +195,8 @@ if __name__ == '__main__':
         runDFU(test_2=False) ## pass macids obtained from scanned QRs code to nrfutil commands to DFU as multiprocesses
         print("==============================================Test 1 results================================================")
         for macs in passedmacs:
-            passedqrs.append(getKeysByValue(macqrpairs, macs))
+            getKeysByValue(macqrpairs, macs)
+        passedqrs = listOfKeys
         for key in passedqrs:
             print('========================= ' + str(key) + ' Passes =========================')
         print(passedqrs)
@@ -235,7 +238,8 @@ if __name__ == '__main__':
             print(endTime, "seconds elapsed.")
             print("==============================================Test 2 results================================================")
             for macs in passedmacs:
-                passedqrs.append(getKeysByValue(macqrpairs, macs))
+                getKeysByValue(macqrpairs, macs)
+            passedqrs = listOfKeys
             for key in passedqrs:
                 print('========================= ' + str(key) + ' Passes =========================')
             print(passedqrs)
