@@ -77,7 +77,7 @@ def change_mac(mac, offset):
     return "{:012X}".format(int(mac, 16) + offset) ## function to increment macid by 1 in HEX
 
 # This handles macid, flash bootloader, and the first DFU for emerald boards
-def parallelDfu(chx, zipf, com, macAddy,active=True): ## function to call DFU command (channel, zip file, com port, mac address, run status)
+def parallelDfu(passedmacs,chx, zipf, com, macAddy,active=True): ## function to call DFU command (channel, zip file, com port, mac address, run status)
     global listOfKeys
     if active == True: #this is here to allow us an easy way of turning off a channel for testing
 
@@ -91,10 +91,7 @@ def parallelDfu(chx, zipf, com, macAddy,active=True): ## function to call DFU co
 
                         raise Exception('Ch' + str(chx) + ' error ') ## error if DFU is not successful after 4 attempts
                 else:
-                    listOfKeys = getKeysByValue(macqrpairs, change_mac(macAddy, -1))
-                    for key in listOfKeys:
-                        # print(key)
-                        print('========================= ' + key + ' Passes =========================')
+                    passedmacs.append(change_mac(macAddy,-1))
                     break
             except:
                 # print('========================= ' + change_mac(macAddy, -1) + ' Fails =========================')
@@ -108,7 +105,7 @@ def runDFU():
     fw = 'Em61x_MHM_LoRaWAN_V2.0.1_Final.zip' ## final fw
     # fw = 'Bat_Test.zip' ## low batt fw
     for p in range(len(macids)):
-        DFU_processes["p{0}".format(p)] = multiprocessing.Process(name="p{0}".format(p), target=parallelDfu, args=(p+1, fw, com[p], macAddyincr[p], True)) ## create variables for multiprocessing based on len of macid
+        DFU_processes["p{0}".format(p)] = multiprocessing.Process(name="p{0}".format(p), target=parallelDfu, args=(passedmacs,p+1, fw, com[p], macAddyincr[p], True)) ## create variables for multiprocessing based on len of macid
         (DFU_processes["p{0}".format(p)]).daemon = True
         (DFU_processes["p{0}".format(p)]).start()
     for o in range(len(macids)):
@@ -155,8 +152,10 @@ if __name__ == '__main__':
     elif facility_a['Facility'] == "Juarez":
         com = ['COM3', 'COM4', 'COM5', 'COM7', 'COM8', 'COM9', 'COM10', 'COM11', 'COM12','COM13']  ## com ports for NRF52-DK at SJ
         serPort = "COM6"  ## Serial port where arduino is connect
-
     while True:
+        manager = Manager()
+        passedmacs = manager.list(range(len(macids)))
+        passedqrs = []
         macAddyincr = [] ## macid hex increment initializer
         scanQRcodes() #function to validate then append qr codes to list
         for x in macids:
@@ -225,10 +224,12 @@ if __name__ == '__main__':
             endTime = round((time.time() - startTime), 2) ## get run time of programming
 
             print(endTime, "seconds elapsed.")
+            for macs in passedmacs:
+                passedqrs.append(str(getKeysByValue(macqrpairs, macs)))
+            for key in passedqrs:
+                print('========================= ' + key + ' Passes =========================')
             print("")
             lines = ["Test # {}".format(counter), '# of Domino(s): {}'.format(len(macids)),'Time taken: {}'.format(endTime),'FW: {}'.format(fw),'##################'] ## data for loggin
-            for i in listOfKeys:
-                print('Passed: ' + i)
             with open('Logging.txt', 'a') as f: ## open txt file to write log to
                 for line in lines:
                     f.write(line) ## write the data in log file
