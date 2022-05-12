@@ -98,7 +98,7 @@ def parallelDfu(passedmacs,chx, zipf, com, macAddy,active=True): ## function to 
                 print("#####An exception occurred with Ch " + str(chx))
     i = 0
 
-def runDFU():
+def runDFU(test_2 = false):
     global flashed, fw
     flashed = False
     DFU_processes = {} ## initialize dict to create DFU process based on # of qrCodes scanned
@@ -110,6 +110,13 @@ def runDFU():
         (DFU_processes["p{0}".format(p)]).start()
     for o in range(len(macids)):
         (DFU_processes["p{0}".format(o)]).join()
+
+    if test_2:
+        wake_timer = multiprocessing.Process(name="wake_timer", target=run,
+                                             args=("on", "off", 0, numNodes, 10, False, True))
+        wake_timer.daemon = True
+        wake_timer.start()
+        wake_timer.join()
 
     flashed = True ## finished flashing
     return flashed
@@ -182,25 +189,26 @@ if __name__ == '__main__':
         print('Putting Nodes into DFU mode')
         sendToArduino(str(1)) ## Communicate with arduino to turn emags on
         run("on","off", 0,numNodes, 20, True,True) ## run status of emags on for 20s then off
-        runDFU() ## pass macids obtained from scanned QRs code to nrfutil commands to DFU as multiprocesses
-
+        runDFU(test_2=False) ## pass macids obtained from scanned QRs code to nrfutil commands to DFU as multiprocesses
+        print("==============================================Test 1 results================================================")
+        for macs in passedmacs:
+            passedqrs.append(getKeysByValue(macqrpairs, macs))
+        for key in passedqrs:
+            print('========================= ' + str(key) + ' Passes =========================')
+        print(passedqrs)
+        print(passedmacs)
         print('Waiting for System test results........................................................... ')
         sys_test_complete = input('Please remove failed units and input "q" to continue: ')
 
         if sys_test_complete == 'q' and flashed:
+            passedmacs = manager.list()
+            passedqrs = []
             sendToArduino(str(1))
             for i in range(3):
                 run("on","off",0,numNodes, 2, True,True)
                 time.sleep(2)
+            runDFU(test_2=True)
 
-            # DFUrun = multiprocessing.Process(name="DFUrun", target=runDFU)
-            wake_timer = multiprocessing.Process(name="wake_timer", target=run, args=("on","off",0, numNodes, 10, False, True))
-            # DFUrun.daemon = True
-            wake_timer.daemon = True
-            # DFUrun.start()
-            wake_timer.start()
-            # DFUrun.join()
-            wake_timer.join()
             if flashed:
                 print("flashing complete.")
                 print('Sleeping Nodes')
@@ -224,6 +232,7 @@ if __name__ == '__main__':
             endTime = round((time.time() - startTime), 2) ## get run time of programming
 
             print(endTime, "seconds elapsed.")
+            print("==============================================Test 2 results================================================")
             for macs in passedmacs:
                 passedqrs.append(getKeysByValue(macqrpairs, macs))
             for key in passedqrs:
