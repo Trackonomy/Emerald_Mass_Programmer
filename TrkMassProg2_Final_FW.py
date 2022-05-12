@@ -98,7 +98,7 @@ def parallelDfu(passedmacs,chx, zipf, com, macAddy,active=True): ## function to 
                 print("#####An exception occurred with Ch " + str(chx))
     i = 0
 
-def runDFU(test_2 = false):
+def runDFU(test_2 = False):
     global flashed, fw
     flashed = False
     DFU_processes = {} ## initialize dict to create DFU process based on # of qrCodes scanned
