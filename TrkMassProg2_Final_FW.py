@@ -98,26 +98,21 @@ def parallelDfu(passedmacs,chx, zipf, com, macAddy,active=True): ## function to 
                 print("#####An exception occurred with Ch " + str(chx))
     i = 0
 
-def runDFU(test_2 = False):
+def runDFU():
     global flashed, fw
     flashed = False
     DFU_processes = {} ## initialize dict to create DFU process based on # of qrCodes scanned
     fw = 'Em61x_MHM_LoRaWAN_V2.0.1_Final.zip' ## final fw
     # fw = 'Bat_Test.zip' ## low batt fw
-    wake_timer = multiprocessing.Process(name="wake", target=sendToArduino,
-                                         args=(str(1),))
 
     for p in range(len(macids)):
         DFU_processes["p{0}".format(p)] = multiprocessing.Process(name="p{0}".format(p), target=parallelDfu, args=(passedmacs,p+1, fw, com[p], macAddyincr[p], True)) ## create variables for multiprocessing based on len of macid
         (DFU_processes["p{0}".format(p)]).daemon = True
         (DFU_processes["p{0}".format(p)]).start()
-    if test_2:
-        wake_timer.daemon = True
-        wake_timer.start()
+
     for o in range(len(macids)):
         (DFU_processes["p{0}".format(o)]).join()
-    if test_2:
-        wake_timer.join()
+
 
 
     flashed = True ## finished flashing
@@ -191,7 +186,7 @@ if __name__ == '__main__':
         print('Putting Nodes into DFU mode')
         sendToArduino(str(1)) ## Communicate with arduino to turn emags on
         run("on","off", 0,numNodes, 20, True,True) ## run status of emags on for 20s then off
-        runDFU(test_2=False) ## pass macids obtained from scanned QRs code to nrfutil commands to DFU as multiprocesses
+        runDFU() ## pass macids obtained from scanned QRs code to nrfutil commands to DFU as multiprocesses
         print("==============================================Test 1 results================================================")
         for macs in passedmacs:
             getKeysByValue(macqrpairs, macs)
@@ -210,7 +205,8 @@ if __name__ == '__main__':
             for i in range(3):
                 run("on","off",0,numNodes, 2, True,True)
                 time.sleep(2)
-            runDFU(test_2=True)
+            sendToArduino(str(1))
+            runDFU()
 
             if flashed:
                 print("flashing complete.")
