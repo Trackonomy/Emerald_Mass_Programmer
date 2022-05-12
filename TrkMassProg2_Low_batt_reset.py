@@ -193,9 +193,10 @@ if __name__ == '__main__':
         if flashed:
 
             ser.close()  ## close serial port
-            passedqrs = getKeysByValue(macqrpairs, passedmacs)
+            for macs in passedmacs:
+                passedqrs.append(getKeysByValue(macqrpairs, macs))
             for key in passedqrs:
-                print('========================= ' + key + ' Passes =========================')
+                print('========================= ' + str(key) + ' Passes =========================')
             print(passedqrs)
             print(passedmacs)
             endTime = round((time.time() - startTime), 2) ## get run time of programming

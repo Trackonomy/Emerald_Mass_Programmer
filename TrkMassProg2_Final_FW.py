@@ -193,13 +193,13 @@ if __name__ == '__main__':
                 run("on","off",0,numNodes, 2, True,True)
                 time.sleep(2)
 
-            DFUrun = multiprocessing.Process(name="DFUrun", target=runDFU)
+            # DFUrun = multiprocessing.Process(name="DFUrun", target=runDFU)
             wake_timer = multiprocessing.Process(name="wake_timer", target=run, args=("on","off",0, numNodes, 10, False, True))
-            DFUrun.daemon = True
+            # DFUrun.daemon = True
             wake_timer.daemon = True
-            DFUrun.start()
+            # DFUrun.start()
             wake_timer.start()
-            DFUrun.join()
+            # DFUrun.join()
             wake_timer.join()
             if flashed:
                 print("flashing complete.")
@@ -224,9 +224,10 @@ if __name__ == '__main__':
             endTime = round((time.time() - startTime), 2) ## get run time of programming
 
             print(endTime, "seconds elapsed.")
-            passedqrs = getKeysByValue(macqrpairs, passedmacs)
+            for macs in passedmacs:
+                passedqrs.append(getKeysByValue(macqrpairs, macs))
             for key in passedqrs:
-                print('========================= ' + key + ' Passes =========================')
+                print('========================= ' + str(key) + ' Passes =========================')
             print(passedqrs)
             print(passedmacs)
             print("")
@@ -235,8 +236,6 @@ if __name__ == '__main__':
                 for line in lines:
                     f.write(line) ## write the data in log file
                     f.write('\n')
-                for i in listOfKeys:
-                    f.write('Passed: ' + i)
             counter = counter + 1
             macids = [] ## reset macid list for next test
             qrCodes = []  ## reset qr codes list for next test

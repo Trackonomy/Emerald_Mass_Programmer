@@ -35,7 +35,7 @@ void loop() {
       for (int x=0; x <=3; x++) {
         allPulse(2000,0,0);
       }
-      delay(15000);
+      delay(10000);
       allOn(0,0);
     }
     char c = Serial.read();{
