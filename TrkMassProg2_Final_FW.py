@@ -224,10 +224,11 @@ if __name__ == '__main__':
             endTime = round((time.time() - startTime), 2) ## get run time of programming
 
             print(endTime, "seconds elapsed.")
-            for macs in passedmacs:
-                passedqrs.append(str(getKeysByValue(macqrpairs, macs)))
+            passedqrs = getKeysByValue(macqrpairs, passedmacs)
             for key in passedqrs:
                 print('========================= ' + key + ' Passes =========================')
+            print(passedqrs)
+            print(passedmacs)
             print("")
             lines = ["Test # {}".format(counter), '# of Domino(s): {}'.format(len(macids)),'Time taken: {}'.format(endTime),'FW: {}'.format(fw),'##################'] ## data for loggin
             with open('Logging.txt', 'a') as f: ## open txt file to write log to

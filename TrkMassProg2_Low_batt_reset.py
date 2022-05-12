@@ -193,7 +193,7 @@ if __name__ == '__main__':
         if flashed:
 
             ser.close()  ## close serial port
-            passedqrs = getKeysByValue(macqrpairs, macs)
+            passedqrs = getKeysByValue(macqrpairs, passedmacs)
             for key in passedqrs:
                 print('========================= ' + key + ' Passes =========================')
             print(passedqrs)
