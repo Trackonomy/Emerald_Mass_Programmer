@@ -34,9 +34,9 @@ void loop() {
     if(b == '1'){
       for (int x=0; x <=3; x++) {
         allPulse(2000,0,0);
-      }
       delay(10000);
-      allOn(1,0);
+      allOn(0,0);
+      }
     }
     char c = Serial.read();{
       if(c == '1'){
