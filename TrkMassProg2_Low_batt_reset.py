@@ -104,8 +104,8 @@ def runDFU():
     global flashed, fw
     flashed = False
     DFU_processes = {} ## initialize dict to create DFU process based on # of qrCodes scanned
-    fw = 'Em61x_MHM_LoRaWAN_V2.0.1_Final.zip' ## final fw
-    # fw = 'Bat_Test.zip' ## low batt fw
+    # fw = 'Em61x_MHM_LoRaWAN_V2.0.1_Final.zip' ## final fw
+    fw = 'Bat_Test.zip' ## low batt fw
     for p in range(len(macids)):
         DFU_processes["p{0}".format(p)] = multiprocessing.Process(name="p{0}".format(p), target=parallelDfu, args=(passedmacs,p+1, fw, com[p], macAddyincr[p], True)) ## create variables for multiprocessing based on len of macid
         (DFU_processes["p{0}".format(p)]).daemon = True
