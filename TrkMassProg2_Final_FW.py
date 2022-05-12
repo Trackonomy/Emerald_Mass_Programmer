@@ -99,6 +99,7 @@ def parallelDfu(chx, zipf, com, macAddy,active=True): ## function to call DFU co
             except:
                 # print('========================= ' + change_mac(macAddy, -1) + ' Fails =========================')
                 print("#####An exception occurred with Ch " + str(chx))
+    i = 0
 
 def runDFU():
     global flashed, fw
