@@ -105,7 +105,7 @@ def runDFU(test_2 = False):
     fw = 'Em61x_MHM_LoRaWAN_V2.0.1_Final.zip' ## final fw
     # fw = 'Bat_Test.zip' ## low batt fw
     wake_timer = multiprocessing.Process(name="wake", target=sendToArduino,
-                                         args=(str(1)))
+                                         args=(str(1),))
 
     for p in range(len(macids)):
         DFU_processes["p{0}".format(p)] = multiprocessing.Process(name="p{0}".format(p), target=parallelDfu, args=(passedmacs,p+1, fw, com[p], macAddyincr[p], True)) ## create variables for multiprocessing based on len of macid
