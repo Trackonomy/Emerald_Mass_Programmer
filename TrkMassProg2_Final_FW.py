@@ -154,7 +154,7 @@ if __name__ == '__main__':
         serPort = "COM6"  ## Serial port where arduino is connect
     while True:
         manager = Manager()
-        passedmacs = manager.list(range(len(macids)))
+        passedmacs = manager.list()
         passedqrs = []
         macAddyincr = [] ## macid hex increment initializer
         scanQRcodes() #function to validate then append qr codes to list

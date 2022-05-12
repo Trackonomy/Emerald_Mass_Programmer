@@ -159,7 +159,7 @@ if __name__ == '__main__':
         macAddyincr = [] ## macid hex increment initializer
         scanQRcodes() #function to validate then append qr codes to list
         manager = Manager()
-        passedmacs = manager.list(range(len(macids)))
+        passedmacs = manager.list()
         passedqrs = []
         for x in macids:
             macAddyincr.append(change_mac(x, 1)) ## increment macids by 1 in HEX
