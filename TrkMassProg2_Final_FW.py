@@ -104,8 +104,8 @@ def runDFU(test_2 = False):
     DFU_processes = {} ## initialize dict to create DFU process based on # of qrCodes scanned
     fw = 'Em61x_MHM_LoRaWAN_V2.0.1_Final.zip' ## final fw
     # fw = 'Bat_Test.zip' ## low batt fw
-    wake_timer = multiprocessing.Process(name="wake_timer", target=run,
-                                         args=("on", "on", 0, numNodes, 10, False, True))
+    wake_timer = multiprocessing.Process(name="wake", target=sendToArduino,
+                                         args=(str(1)))
 
     for p in range(len(macids)):
         DFU_processes["p{0}".format(p)] = multiprocessing.Process(name="p{0}".format(p), target=parallelDfu, args=(passedmacs,p+1, fw, com[p], macAddyincr[p], True)) ## create variables for multiprocessing based on len of macid
@@ -114,7 +114,6 @@ def runDFU(test_2 = False):
     if test_2:
         wake_timer.daemon = True
         wake_timer.start()
-        wake_timer.join()
     for o in range(len(macids)):
         (DFU_processes["p{0}".format(o)]).join()
     if test_2:

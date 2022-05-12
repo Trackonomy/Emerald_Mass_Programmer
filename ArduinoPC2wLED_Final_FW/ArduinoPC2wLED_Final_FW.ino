@@ -34,12 +34,15 @@ void loop() {
     if(b == '1'){
       for (int x=0; x <=3; x++) {
         allPulse(2000,0,0);
-      delay(10000);
-      allOn(0,0);
       }
     }
-    char c = Serial.read();{
+    char c = Serial.read();
       if(c == '1'){
+        delay(10000);
+        allOn(0,0);
+      }
+    char d = Serial.read();{
+      if(d == '1'){
         allOff(0);
       }
     }
