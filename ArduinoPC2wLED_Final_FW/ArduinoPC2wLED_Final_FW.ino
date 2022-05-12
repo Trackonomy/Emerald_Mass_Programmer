@@ -92,11 +92,12 @@ void allOff (int previous){
 }
 
 void allPulse(int delay_time, int current, int previous) {
-  
   for (current; current<10; current++){
   ledChip.SetChannelPWM(current, 255); //Turns on LED
   }
   digitalWrite(LED_10,HIGH);
+  for (int i = 0; i <= iter; i++) {
+    digitalWrite(emags[i], HIGH); //Turns all 10 magnets on
   delay(delay_time); //delay to turn on magnets for atleast 10s to put them into DFU mode
   for (int i = 0; i <= iter; i++) {
     digitalWrite(emags[i], LOW);  //Turns all 10 magnets off
@@ -105,7 +106,7 @@ void allPulse(int delay_time, int current, int previous) {
   for (previous; previous <= iter; previous++) {
     ledChip.SetChannelPWM(previous, 0); //Turns off LED
   }
-  delay(delay_time);   
+  delay(delay_time);     
 }
 //
 //void allOff_1() {
