@@ -36,6 +36,7 @@ void allPulse(int delay_time, int current, int previous) {
   digitalWrite(LED_10,HIGH);
   for (int i = 0; i <= iter; i++) {
     digitalWrite(emags[i], HIGH); //Turns all 10 magnets on
+  }
   delay(delay_time); //delay to turn on magnets for atleast 10s to put them into DFU mode
   for (int i = 0; i <= iter; i++) {
     digitalWrite(emags[i], LOW);  //Turns all 10 magnets off
