@@ -23,6 +23,7 @@ void loop() {
     if (a == '1') {
       allOn(20000,0);
       allOff(0);
+      Serial.println(1);
     }
     char b = Serial.read();
     if(b == '1'){
@@ -32,7 +33,7 @@ void loop() {
     }
     char c = Serial.read();
       if(c == '1'){
-        Serial.println(1)
+        Serial.println(1);
         delay(10000);
         allOn(0,0);
       }

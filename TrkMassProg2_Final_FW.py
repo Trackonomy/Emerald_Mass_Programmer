@@ -186,6 +186,10 @@ if __name__ == '__main__':
         print('Putting Nodes into DFU mode')
         sendToArduino(str(1)) ## Communicate with arduino to turn emags on
         run("on","off", 0,numNodes, 20, True,True) ## run status of emags on for 20s then off
+        y = ser.readline()
+        string_x = y.decode()
+        stripped_string_y = string_y.strip()
+        print(stripped_string_y)
         runDFU() ## pass macids obtained from scanned QRs code to nrfutil commands to DFU as multiprocesses
         print("==============================================Test 1 results================================================")
         for macs in passedmacs:
