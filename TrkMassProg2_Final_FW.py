@@ -206,6 +206,10 @@ if __name__ == '__main__':
                 run("on","off",0,numNodes, 2, True,True)
                 time.sleep(2)
             sendToArduino(str(1))
+            x = ser.readline()
+            string_x = x.decode()
+            stripped_string_x = string_x.strip()
+            print(stripped_string_x)
             runDFU()
 
             if flashed:

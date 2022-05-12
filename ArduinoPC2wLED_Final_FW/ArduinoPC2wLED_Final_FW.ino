@@ -24,12 +24,6 @@ void loop() {
       allOn(20000,0);
       allOff(0);
     }
-//    Serial.println(1);
-//    char b = Serial.read();
-//    if (b == '1'){
-//      delay(10000);
-//      allOff(0);
-//    }
     char b = Serial.read();
     if(b == '1'){
       for (int x=0; x <=3; x++) {
@@ -38,6 +32,7 @@ void loop() {
     }
     char c = Serial.read();
       if(c == '1'){
+        Serial.println(1)
         delay(10000);
         allOn(0,0);
       }
