@@ -152,7 +152,7 @@ if __name__ == '__main__':
     facility_a = inquirer.prompt(facility_q) ## Ask user if they want to program more dominos
     if facility_a['Facility'] == "San Jose":
         com = ['COM9', 'COM10', 'COM12', 'COM13', 'COM14', 'COM15', 'COM16', 'COM18', 'COM19','COM20']  ## com ports for NRF52-DK at SJ
-        serPort = "COM17"  ## Serial port where arduino is connect
+        serPort = "COM4"  ## Serial port where arduino is connect
     elif facility_a['Facility'] == "Juarez":
         com = ['COM3', 'COM4', 'COM5', 'COM7', 'COM8', 'COM9', 'COM10', 'COM11', 'COM12','COM13']  ## com ports for NRF52-DK at SJ
         serPort = "COM6"  ## Serial port where arduino is connect
@@ -182,6 +182,7 @@ if __name__ == '__main__':
         print("Serial port " + serPort + " opened  Baudrate " + str(baudRate))
 
         time.sleep(2) ## delay to get arduino ready
+        time.sleep(2) ## delay to get arduino ready
         # sendToArduino(str(len(macids)))
         print('Putting Nodes into DFU mode')
         sendToArduino(str(1)) ## Communicate with arduino to turn emags on
@@ -205,11 +206,11 @@ if __name__ == '__main__':
         if sys_test_complete == 'q' and flashed:
             passedmacs = manager.list()
             passedqrs = []
-            sendToArduino(str(1))
+            sendToArduino(str(2))
             for i in range(3):
                 run("on","off",0,numNodes, 2, True,True)
                 time.sleep(2)
-            sendToArduino(str(1))
+            sendToArduino(str(3))
             x = ser.readline()
             string_x = x.decode()
             stripped_string_x = string_x.strip()
@@ -220,7 +221,7 @@ if __name__ == '__main__':
                 print("flashing complete.")
                 print('Sleeping Nodes')
                 time.sleep(10)
-                sendToArduino(str(1))
+                sendToArduino(str(4))
                 run("off", "off", 0, numNodes, 0, True, False)
                 ser.close()  ## close serial port
 
