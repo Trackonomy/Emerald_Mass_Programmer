@@ -38,7 +38,7 @@ void loop() {
       
       case '2':
       Serial.println(0);
-      delay(10000);
+      delay(15000);
       allOn(0,0);
       break;
   
