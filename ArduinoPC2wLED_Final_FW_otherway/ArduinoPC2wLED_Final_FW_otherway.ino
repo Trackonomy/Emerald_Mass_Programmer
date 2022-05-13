@@ -26,7 +26,7 @@ void loop() {
       case '0': 
       allOn(20000,0);
       allOff(0);
-      Serial.println(1);
+//      Serial.println(1);
       break;
   
   //    char b = Serial.read();
@@ -37,7 +37,7 @@ void loop() {
       break;
       
       case '2':
-      Serial.println(0);
+//      Serial.println(0);
       delay(15000);
       allOn(0,0);
       break;

@@ -125,6 +125,16 @@ def runDFU():
 def sendToArduino(sendStr):
     ser.write(bytes(sendStr, 'utf-8')) ## function to communicate with arduino
 
+def get_systest_records(qrs):
+    for qr in qrs:
+        test = requests.get("https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + qr)
+
+        dom_record = json.loads(test.text)
+        if dom_record != []:
+            gotten_qrs.append(dom_record[0]['qrcode'])
+            print(dom_record[0]['qrcode'])
+        print(dom_record)
+
 
 def run(on,off,start,finish,delaytime,start_stat=False,stop_stat=False): ## status for emags turning on and off triggered by Arduino (0, number of nodes, time emag is on)
     if start_stat:
@@ -186,10 +196,10 @@ if __name__ == '__main__':
         print('Putting Nodes into DFU mode')
         ser.write(b'0') ## Communicate with arduino to turn emags on
         run("on","off", 0,numNodes, 20, True,True) ## run status of emags on for 20s then off
-        y = ser.readline()
-        string_y = y.decode()
-        stripped_string_y = string_y.strip()
-        print(stripped_string_y)
+        # y = ser.readline()
+        # string_y = y.decode()
+        # stripped_string_y = string_y.strip()
+        # print(stripped_string_y)
         runDFU() ## pass macids obtained from scanned QRs code to nrfutil commands to DFU as multiprocesses
         print("==============================================Test 1 results================================================")
         for macs in passedmacs:
@@ -210,10 +220,10 @@ if __name__ == '__main__':
                 run("on","off",0,numNodes, 2, True,True)
                 time.sleep(2)
             ser.write(b'2')
-            x = ser.readline()
-            string_x = x.decode()
-            stripped_string_x = string_x.strip()
-            print(stripped_string_x)
+            # x = ser.readline()
+            # string_x = x.decode()
+            # stripped_string_x = string_x.strip()
+            # print(stripped_string_x)
             runDFU()
 
             if flashed:
