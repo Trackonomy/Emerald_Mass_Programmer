@@ -138,6 +138,7 @@ def get_systest_records(qrs):
         if dom_record != []:
             gotten_qrs.append(dom_record[0]['qrcode'])
             print(gotten_qrs)
+            print('\n')
         print(dom_record)
 
 
@@ -224,9 +225,11 @@ if __name__ == '__main__':
             get_systest_records(passedqrs)
             ask_finish = input('Hit q to run again or p to continue')
             if ask_finish == 'q':
+                print('\n')
                 get_systest_records(passedqrs)
                 ask_finish = input('Hit q to run again or p to continue')
             if ask_finish == 'p':
+                print('\n')
                 break
         # if len(gotten_qrs) == len(passdqrs):
         #     print('Obtained record for all passed QRs')
