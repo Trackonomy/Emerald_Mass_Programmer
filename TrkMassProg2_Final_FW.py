@@ -125,14 +125,19 @@ def runDFU():
 def sendToArduino(sendStr):
     ser.write(bytes(sendStr, 'utf-8')) ## function to communicate with arduino
 
+def delete_records(qrs):
+    for value in qrs:
+            print('-----------------Deleting recording for {}'.format(value))
+            print(requests.delete("https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + value))
 def get_systest_records(qrs):
+    gotten_qrs = []
     for qr in qrs:
         test = requests.get("https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + qr)
 
         dom_record = json.loads(test.text)
         if dom_record != []:
             gotten_qrs.append(dom_record[0]['qrcode'])
-            print(dom_record[0]['qrcode'])
+            print(gotten_qrs)
         print(dom_record)
 
 
@@ -171,7 +176,9 @@ if __name__ == '__main__':
         passedmacs = manager.list()
         passedqrs = []
         macAddyincr = [] ## macid hex increment initializer
+        failedqrs = []
         scanQRcodes() #function to validate then append qr codes to list
+        delete_records(qrCodes)
         for x in macids:
             macAddyincr.append(change_mac(x, 1)) ## increment macids by 1 in HEX
         # print(macids)
@@ -201,20 +208,28 @@ if __name__ == '__main__':
         # stripped_string_y = string_y.strip()
         # print(stripped_string_y)
         runDFU() ## pass macids obtained from scanned QRs code to nrfutil commands to DFU as multiprocesses
-        print("==============================================Test 1 results================================================")
+        # print("==============================================Test 1 results================================================")
         for macs in passedmacs:
             getKeysByValue(macqrpairs, macs)
         passedqrs = listOfKeys
-        for key in passedqrs:
-            print('========================= ' + str(key) + ' Passes =========================')
-        print(passedqrs)
-        print(passedmacs)
+        # failedqrs = list(set(qrCodes) - set(passedqrs))
+        # for key in passedqrs:
+        #     print('========================= ' + str(key) + ' Passes =========================')
+        # for key in failedqrs:
+        #     print('========================= ' + str(key) + ' Fails =========================')
+        # print(passedqrs)
+        # print(passedmacs)
         print('Waiting for System test results........................................................... ')
+        while True:
+            get_systest_records(passedqrs)
+            if len(gotten_qrs) == len(passedqrs):
+                break
         sys_test_complete = input('Please remove failed units and input "q" to continue: ')
 
         if sys_test_complete == 'q' and flashed:
             passedmacs = manager.list()
             passedqrs = []
+            failedqrs = []
             ser.write(b'1')
             for i in range(3):
                 run("on","off",0,numNodes, 2, True,True)
@@ -253,9 +268,12 @@ if __name__ == '__main__':
             for macs in passedmacs:
                 getKeysByValue(macqrpairs, macs)
             passedqrs = listOfKeys
+            failedqrs = list(set(qrCodes) - set(passedqrs))
             for key in passedqrs:
                 print('========================= ' + str(key) + ' Passes =========================')
-            print(passedqrs)
+            for key in failedqrs:
+                print('========================= ' + str(key) + ' Fails =========================')
+            # print(passedqrs)
             print(passedmacs)
             print("")
             lines = ["Test # {}".format(counter), '# of Domino(s): {}'.format(len(macids)),'Time taken: {}'.format(endTime),'FW: {}'.format(fw),'##################'] ## data for loggin
@@ -267,6 +285,9 @@ if __name__ == '__main__':
             macids = [] ## reset macid list for next test
             qrCodes = []  ## reset qr codes list for next test
             macqrpairs = {}  ## reset mac qr pair dict for next test
+            passedqrs = []
+            failedqrs = []
+            passedmacs = []
             flashed = False ## reset DFU status
             again_q = [
                 inquirer.List(
