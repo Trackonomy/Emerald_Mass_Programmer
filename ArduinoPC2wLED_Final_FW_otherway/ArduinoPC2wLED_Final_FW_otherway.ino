@@ -22,29 +22,30 @@ void loop() {
     //String a = Serial.readString();
     char x = Serial.read();
 
-    switch(x)
-    case '0': 
-    allOn(20000,0);
-    allOff(0);
-    Serial.println(1);
-    break;
-
-//    char b = Serial.read();
-    case '1':
-    for (int x=0; x <=3; x++) {
-      allPulse(2000,0,0);
+    switch(x){
+      case '0': 
+      allOn(20000,0);
+      allOff(0);
+      Serial.println(1);
+      break;
+  
+  //    char b = Serial.read();
+      case '1':
+      for (int x=0; x <=3; x++) {
+        allPulse(2000,0,0);
+      }
+      break;
+      
+      case '2':
+      Serial.println(0);
+      delay(10000);
+      allOn(0,0);
+      break;
+  
+      case '3':
+      allOff(0);
+      break;
     }
-    break;
-    
-    case '2':
-    Serial.println(0);
-    delay(10000);
-    allOn(0,0);
-    break;
-
-    case '3':
-    allOff(0);
-    break
   }
 }
 
