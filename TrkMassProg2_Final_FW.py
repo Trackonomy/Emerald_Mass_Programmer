@@ -219,7 +219,7 @@ if __name__ == '__main__':
             if flashed:
                 print("flashing complete.")
                 print('Sleeping Nodes')
-                time.sleep(10)
+                time.sleep(20)
                 ser.write(b'3')
                 run("off", "off", 0, numNodes, 0, True, False)
                 ser.close()  ## close serial port

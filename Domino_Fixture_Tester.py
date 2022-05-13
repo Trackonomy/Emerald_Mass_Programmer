@@ -24,10 +24,10 @@ qrs = ["18-280222-E30045",
 
 value = "18-030322-E30808"
 
-#
-for value in qrs:
 
-        print(requests.delete("https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + value))
+# for value in qrs:
+#
+#         print(requests.delete("https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + value))
 
 for qr in qrs:
 
