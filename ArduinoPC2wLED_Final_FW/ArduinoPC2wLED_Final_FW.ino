@@ -26,19 +26,19 @@ void loop() {
       Serial.println(1);
     }
     char b = Serial.read();
-    if(b == '2'){
+    if(b == '1'){
       for (int x=0; x <=3; x++) {
         allPulse(2000,0,0);
       }
     }
     char c = Serial.read();
-      if(c == '3'){
-        Serial.println(1);
+      if(c == '1'){
+        Serial.println(0);
         delay(10000);
         allOn(0,0);
       }
     char d = Serial.read();{
-      if(d == '4'){
+      if(d == '1'){
         allOff(0);
       }
     }

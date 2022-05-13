@@ -182,13 +182,12 @@ if __name__ == '__main__':
         print("Serial port " + serPort + " opened  Baudrate " + str(baudRate))
 
         time.sleep(2) ## delay to get arduino ready
-        time.sleep(2) ## delay to get arduino ready
         # sendToArduino(str(len(macids)))
         print('Putting Nodes into DFU mode')
         sendToArduino(str(1)) ## Communicate with arduino to turn emags on
         run("on","off", 0,numNodes, 20, True,True) ## run status of emags on for 20s then off
         y = ser.readline()
-        string_x = y.decode()
+        string_y = y.decode()
         stripped_string_y = string_y.strip()
         print(stripped_string_y)
         runDFU() ## pass macids obtained from scanned QRs code to nrfutil commands to DFU as multiprocesses
@@ -206,11 +205,11 @@ if __name__ == '__main__':
         if sys_test_complete == 'q' and flashed:
             passedmacs = manager.list()
             passedqrs = []
-            sendToArduino(str(2))
+            sendToArduino(str(1))
             for i in range(3):
                 run("on","off",0,numNodes, 2, True,True)
                 time.sleep(2)
-            sendToArduino(str(3))
+            sendToArduino(str(1))
             x = ser.readline()
             string_x = x.decode()
             stripped_string_x = string_x.strip()
@@ -221,7 +220,7 @@ if __name__ == '__main__':
                 print("flashing complete.")
                 print('Sleeping Nodes')
                 time.sleep(10)
-                sendToArduino(str(4))
+                sendToArduino(str(1))
                 run("off", "off", 0, numNodes, 0, True, False)
                 ser.close()  ## close serial port
 
