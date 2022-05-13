@@ -19,8 +19,8 @@ void setup() {
 
 void loop() {
   if (Serial.available() > 0) {
-    char a = Serial.read();
-    if (a == '1') {
+    String a = Serial.readString();
+    if (a == 'start') {
       allOn(20000,0);
       allOff(0);
       Serial.println(1);

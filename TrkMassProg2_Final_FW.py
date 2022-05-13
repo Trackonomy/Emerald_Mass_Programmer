@@ -184,7 +184,7 @@ if __name__ == '__main__':
         time.sleep(2) ## delay to get arduino ready
         # sendToArduino(str(len(macids)))
         print('Putting Nodes into DFU mode')
-        sendToArduino(str(1)) ## Communicate with arduino to turn emags on
+        ser.write(b'start') ## Communicate with arduino to turn emags on
         run("on","off", 0,numNodes, 20, True,True) ## run status of emags on for 20s then off
         y = ser.readline()
         string_y = y.decode()
