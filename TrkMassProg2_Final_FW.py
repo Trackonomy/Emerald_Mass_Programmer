@@ -179,8 +179,6 @@ if __name__ == '__main__':
 
         baudRate = 9600 ## set baud rate
         ser = serial.Serial(serPort, baudRate)
-        adjSendStr = chr('a')
-        ser.write(adjSendStr)
         print("Serial port " + serPort + " opened  Baudrate " + str(baudRate))
 
         time.sleep(2) ## delay to get arduino ready
