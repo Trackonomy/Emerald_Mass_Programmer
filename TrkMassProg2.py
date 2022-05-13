@@ -100,7 +100,7 @@ def parallelDfu(chx, zipf, com, macAddy,active=True): ## function to call DFU co
 def runDFU():
     global flashed, fw
 
-    com = ['COM9','COM10','COM12','COM13','COM14','COM15','COM16','COM18','COM19','COM20'] ## com ports for NRF52-DK
+    # com = ['COM9','COM10','COM12','COM13','COM14','COM15','COM16','COM18','COM19','COM20'] ## com ports for NRF52-DK
     # com = ['COM9','COM12','COM18','COM19','COM20']
     DFU_processes = {} ## initialize dict to create DFU process based on # of qrCodes scanned
     # fw = 'Em61x_MHM_LoRaWAN_V2.0.1_Final.zip' ## final fw
@@ -146,9 +146,25 @@ def run(start,finish,delaytime): ## status for emags turning on and off triggere
 
 if __name__ == '__main__':
     counter = 1
-    passed_qrs = []
-    failed_qrs = []
+    facility_q =  [inquirer.List(
+                "Facility",
+                message="Select Facility you are at",
+                choices=["San Jose", "Juarez"],
+                default=["San Jose"],
+            ),
+        ]
+    facility_a = inquirer.prompt(facility_q) ## Ask user if they want to program more dominos
+    if facility_a['Facility'] == "San Jose":
+        com = ['COM9', 'COM10', 'COM12', 'COM13', 'COM14', 'COM15', 'COM16', 'COM18', 'COM19','COM20']  ## com ports for NRF52-DK at SJ
+        serPort = "COM4"  ## Serial port where arduino is connect
+    elif facility_a['Facility'] == "Juarez":
+        com = ['COM3', 'COM4', 'COM5', 'COM7', 'COM8', 'COM9', 'COM10', 'COM11', 'COM12','COM13']  ## com ports for NRF52-DK at SJ
+        serPort = "COM6"  ## Serial port where arduino is connect
     while True:
+        manager = Manager()
+        passedmacs = manager.list()
+        passed_qrs = []
+        failed_qrs = []
         macAddyincr = [] ## macid hex increment initializer
         scanQRcodes() #function to validate then append qr codes to list
         for x in macids:
@@ -166,7 +182,7 @@ if __name__ == '__main__':
         print("")
         numNodes = 10 ## number of magnets turning on
 
-        serPort = "COM17" ## Serial port where arduino is connect
+        # serPort = "COM17" ## Serial port where arduino is connect
         baudRate = 9600 ## set baud rate
         ser = serial.Serial(serPort, baudRate)
         print("Serial port " + serPort + " opened  Baudrate " + str(baudRate))
@@ -189,9 +205,17 @@ if __name__ == '__main__':
         endTime = round((time.time() - startTime), 2) ## get run time of programming
 
         print(endTime, "seconds elapsed.")
+        for macs in passedmacs:
+            getKeysByValue(macqrpairs, macs)
+        passedqrs = listOfKeys
+        failedqrs = list(set(qrCodes) - set(passedqrs))
+        for key in passedqrs:
+            print('========================= ' + str(key) + ' Passes =========================')
+        for key in failedqrs:
+            print('========================= ' + str(key) + ' Fails =========================')
+        # print(passedqrs)
+        print(passedmacs)
         print("")
-        passed_qrs = listOfKeys
-
         lines = ["Test # {}".format(counter), '# of Domino(s): {}'.format(len(macids)),'Time taken: {}'.format(endTime),'##################','FW: {}'.format(fw)] ## data for loggin
         with open('Logging.txt', 'a') as f: ## open txt file to write log to
             for line in lines:

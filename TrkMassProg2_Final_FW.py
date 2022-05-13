@@ -222,8 +222,14 @@ if __name__ == '__main__':
         print('Waiting for System test results........................................................... ')
         while True:
             get_systest_records(passedqrs)
-            if len(gotten_qrs) == len(passedqrs):
+            ask_finish = input('Hit q to run again or p to continue')
+            if ask_finish == 'q':
+                get_systest_records(passedqrs)
+                ask_finish = input('Hit q to run again or p to continue')
+            if ask_finish == 'p':
                 break
+        # if len(gotten_qrs) == len(passdqrs):
+        #     print('Obtained record for all passed QRs')
         sys_test_complete = input('Please remove failed units and input "q" to continue: ')
 
         if sys_test_complete == 'q' and flashed:
