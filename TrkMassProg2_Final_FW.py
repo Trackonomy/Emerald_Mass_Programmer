@@ -293,17 +293,18 @@ if __name__ == '__main__':
             # print(passedqrs)
             print(passedmacs)
             print("")
-            lines = ["Test # {}".format(counter), '# of Domino(s): {}'.format(len(macids)),'Time taken: {}'.format(endTime),'FW: {}'.format(fw),'##################'] ## data for loggin
+            lines = ["Test # {}".format(counter), '# of Domino(s): {}'.format(len(macids)),'Time taken: {}'.format(endTime),'FW: {}'.format(fw),'###############################'] ## data for loggin
             with open('Log_'+datetime.today().strftime('%Y%m%d')+'.txt', 'a+') as f: ## open txt file to write log to
                 for line in lines:
                     f.write(line) ## write the data in log file
                     f.write('\n')
                 for i in passedqrs:
-                    f.write('{} '.format(i))
+                    f.write('{} Passes '.format(i))
                     f.write('\n')
                 for i in failedqrs:
-                    f.write('{} '.format(i))
+                    f.write('{} Fails'.format(i))
                     f.write('\n')
+                f.write('############################################')
             counter = counter + 1
             macids = [] ## reset macid list for next test
             qrCodes = []  ## reset qr codes list for next test
