@@ -194,10 +194,14 @@ if __name__ == '__main__':
 
             ser.close()  ## close serial port
             for macs in passedmacs:
-                passedqrs.append(getKeysByValue(macqrpairs, macs))
+                getKeysByValue(macqrpairs, macs)
+            passedqrs = listOfKeys
+            failedqrs = list(set(qrCodes) - set(passedqrs))
             for key in passedqrs:
                 print('========================= ' + str(key) + ' Passes =========================')
-            print(passedqrs)
+            for key in failedqrs:
+                print('========================= ' + str(key) + ' Fails =========================')
+            # print(passedqrs)
             print(passedmacs)
             endTime = round((time.time() - startTime), 2) ## get run time of programming
 
