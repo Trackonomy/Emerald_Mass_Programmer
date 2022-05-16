@@ -130,7 +130,6 @@ def delete_records(qrs):
             print('-----------------Deleting recording for {}'.format(value))
             print(requests.delete("https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + value))
 def get_systest_records(qrs):
-    gotten_qrs = []
     for qr in qrs:
         test = requests.get("https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + qr)
 
@@ -179,6 +178,7 @@ if __name__ == '__main__':
         macAddyincr = [] ## macid hex increment initializer
         failedqrs = []
         sys_test_fails = []
+        gotten_qrs = []
         scanQRcodes() #function to validate then append qr codes to list
         delete_records(qrCodes)
         for x in macids:
@@ -220,6 +220,7 @@ if __name__ == '__main__':
             get_systest_records(passedqrs)
             ask_finish = input('Hit q to run again or p to continue: ')
             if ask_finish == 'q':
+                gotten_qrs.clear()
                 print('\n')
                 get_systest_records(passedqrs)
                 ask_finish = input('Hit q to run again or p to continue: ')
