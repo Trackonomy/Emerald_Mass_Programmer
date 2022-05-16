@@ -35,34 +35,34 @@ def scanQRcodes():
             qr = input("Scan Domino QR Code (enter 'q' when done scanning): ")
         qrCodes.append(qr)
 
-    def get_macs(qr_list):
-        macids.clear()
-        print("Receiving data on each QR Code...")
-        for qr in qr_list:
-            try:
-                # get data on entered qr code from database
-                url = "http://vmprdate.eastus.cloudapp.azure.com:9000/api/v1/manifest/?qrcode=" + qr
-                r = requests.get(url)
-                rawjson = json.loads(r.text)
+def get_macs(qr_list):
+    macids.clear()
+    print("Receiving data on each QR Code...")
+    for qr in qr_list:
+        try:
+            # get data on entered qr code from database
+            url = "http://vmprdate.eastus.cloudapp.azure.com:9000/api/v1/manifest/?qrcode=" + qr
+            r = requests.get(url)
+            rawjson = json.loads(r.text)
 
-                # get data from entered qr code
-                data = []
-                if rawjson['error'] == False:
-                    data = rawjson['data']
+            # get data from entered qr code
+            data = []
+            if rawjson['error'] == False:
+                data = rawjson['data']
 
-                    macid = data[0]['macid']
-                    macqrpairs[qr] = macid
-                    # print(macid)
-                    if macid != "None" and macid != "":
-                        macids.append(macid)
-                    else:
-                        print("Macid not found for ",qr)
-                        continue
-                    serverResponse = json.dumps(data)
+                macid = data[0]['macid']
+                macqrpairs[qr] = macid
+                # print(macid)
+                if macid != "None" and macid != "":
+                    macids.append(macid)
+                else:
+                    print("Macid not found for ",qr)
+                    continue
+                serverResponse = json.dumps(data)
 
-            except Exception as e:
-                print("Error Occured\n")
-                print(e)
+        except Exception as e:
+            print("Error Occured\n")
+            print(e)
 def validateQR(qr):
     if len(qr) == 16 and qr.count('-') == 2 and qr[:2] == '18':
         return True
