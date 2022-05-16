@@ -226,8 +226,8 @@ if __name__ == '__main__':
                 get_systest_records(passedqrs)
                 ask_finish = input('Hit q to run again or p to continue: ')
             if ask_finish == 'p':
-                print(list(set(passedqrs).difference(gotten_qrs)))
-                for i in list(set(passedqrs).difference(gotten_qrs)):
+                print(list(set(qrCodes).difference(gotten_qrs)))
+                for i in list(set(qrCodes).difference(gotten_qrs)):
                     sys_test_fails.append(i)
                     print("--------------------- {} Fails, remove unit--------------------".format(i))
                     print('\n')
