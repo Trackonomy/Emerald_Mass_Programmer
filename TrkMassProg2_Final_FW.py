@@ -178,6 +178,7 @@ if __name__ == '__main__':
         passedqrs = []
         macAddyincr = [] ## macid hex increment initializer
         failedqrs = []
+        sys_test_fails = []
         scanQRcodes() #function to validate then append qr codes to list
         delete_records(qrCodes)
         for x in macids:
@@ -213,22 +214,22 @@ if __name__ == '__main__':
         for macs in passedmacs:
             getKeysByValue(macqrpairs, macs)
         passedqrs = listOfKeys
-        # failedqrs = list(set(qrCodes) - set(passedqrs))
-        # for key in passedqrs:
-        #     print('========================= ' + str(key) + ' Passes =========================')
-        # for key in failedqrs:
-        #     print('========================= ' + str(key) + ' Fails =========================')
-        # print(passedqrs)
-        # print(passedmacs)
+
         print('Waiting for System test results........................................................... ')
         while True:
             get_systest_records(passedqrs)
-            ask_finish = input('Hit q to run again or p to continue')
+            ask_finish = input('Hit q to run again or p to continue: ')
             if ask_finish == 'q':
                 print('\n')
                 get_systest_records(passedqrs)
-                ask_finish = input('Hit q to run again or p to continue')
+                ask_finish = input('Hit q to run again or p to continue: ')
             if ask_finish == 'p':
+                for i in gottenqrs:
+                    if i not in passedqrs:
+                        sys_test_fails.append(i)
+                        print("--------------------- {} Fails, remove unit--------------------".format(i))
+                        print('\n')
+                qrCodes = list(set(qrCodes) - set(sys_test_fails))
                 print('\n')
                 break
         # if len(gotten_qrs) == len(passdqrs):
@@ -237,8 +238,8 @@ if __name__ == '__main__':
 
         if sys_test_complete == 'q' and flashed:
             passedmacs = manager.list()
-            passedqrs = []
-            failedqrs = []
+            passedqrs.clear()
+            failedqrs.clear()
             ser.write(b'1')
             for i in range(3):
                 run("on","off",0,numNodes, 2, True,True)
@@ -286,9 +287,15 @@ if __name__ == '__main__':
             print(passedmacs)
             print("")
             lines = ["Test # {}".format(counter), '# of Domino(s): {}'.format(len(macids)),'Time taken: {}'.format(endTime),'FW: {}'.format(fw),'##################'] ## data for loggin
-            with open('Logging.txt', 'a') as f: ## open txt file to write log to
+            with open('Logging.txt'+datetime.today().strftime('%Y%m%d'), 'a') as f: ## open txt file to write log to
                 for line in lines:
                     f.write(line) ## write the data in log file
+                    f.write('\n')
+                for i in passedqrs:
+                    f.write('{} '.format(i))
+                    f.write('\n')
+                for i in failedqrs:
+                    f.write('{} '.format(i))
                     f.write('\n')
             counter = counter + 1
             macids = [] ## reset macid list for next test

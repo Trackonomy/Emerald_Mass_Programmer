@@ -19,28 +19,32 @@ void setup() {
 
 void loop() {
   if (Serial.available() > 0) {
-    String a = Serial.readString();
-    if (a == 'start') {
+    //String a = Serial.readString();
+    char x = Serial.read();
+
+    switch(x){
+      case '0': 
       allOn(20000,0);
       allOff(0);
-      Serial.println(1);
-    }
-    char b = Serial.read();
-    if(b == '1'){
+//      Serial.println(1);
+      break;
+  
+  //    char b = Serial.read();
+      case '1':
       for (int x=0; x <=3; x++) {
         allPulse(2000,0,0);
       }
-    }
-    char c = Serial.read();
-      if(c == '1'){
-        Serial.println(0);
-        delay(10000);
-        allOn(0,0);
-      }
-    char d = Serial.read();{
-      if(d == '1'){
-        allOff(0);
-      }
+      break;
+      
+      case '2':
+//      Serial.println(0);
+      delay(15000);
+      allOn(0,0);
+      break;
+  
+      case '3':
+      allOff(0);
+      break;
     }
   }
 }
