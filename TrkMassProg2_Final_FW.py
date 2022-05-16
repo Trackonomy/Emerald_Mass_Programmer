@@ -2,6 +2,7 @@ import requests
 import json
 import serial
 import time
+from datetime import datetime
 import os
 import subprocess
 import multiprocessing
@@ -225,11 +226,10 @@ if __name__ == '__main__':
                 get_systest_records(passedqrs)
                 ask_finish = input('Hit q to run again or p to continue: ')
             if ask_finish == 'p':
-                for i in gotten_qrs:
-                    if i not in passedqrs:
-                        sys_test_fails.append(i)
-                        print("--------------------- {} Fails, remove unit--------------------".format(i))
-                        print('\n')
+                for i in list(set(passedqrs).difference(gotten_qrs):
+                    sys_test_fails.append(i)
+                    print("--------------------- {} Fails, remove unit--------------------".format(i))
+                    print('\n')
                 qrCodes = list(set(qrCodes) - set(sys_test_fails))
                 print('\n')
                 break
