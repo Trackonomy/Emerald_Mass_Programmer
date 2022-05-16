@@ -224,7 +224,7 @@ if __name__ == '__main__':
                 get_systest_records(passedqrs)
                 ask_finish = input('Hit q to run again or p to continue: ')
             if ask_finish == 'p':
-                for i in gottenqrs:
+                for i in gotten_qrs:
                     if i not in passedqrs:
                         sys_test_fails.append(i)
                         print("--------------------- {} Fails, remove unit--------------------".format(i))
