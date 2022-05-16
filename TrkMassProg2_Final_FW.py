@@ -236,6 +236,7 @@ if __name__ == '__main__':
                     print("--------------------- {} Fails, remove unit--------------------".format(i))
                     print('\n')
                 qrCodes = list(set(qrCodes) - set(sys_test_fails))
+                print(qrCodes)
                 print('\n')
                 break
         # if len(gotten_qrs) == len(passdqrs):
@@ -306,12 +307,13 @@ if __name__ == '__main__':
                     f.write('\n')
                 f.write('############################################')
             counter = counter + 1
-            macids = [] ## reset macid list for next test
-            qrCodes = []  ## reset qr codes list for next test
-            macqrpairs = {}  ## reset mac qr pair dict for next test
-            passedqrs = []
-            failedqrs = []
-            passedmacs = []
+            macids.clear() ## reset macid list for next test
+            qrCodes.clear()  ## reset qr codes list for next test
+            macqrpairs.clear()  ## reset mac qr pair dict for next test
+            passedqrs.clear()
+            failedqrs.clear()
+            passedmacs.clear()
+            gotten_qrs.clear()
             flashed = False ## reset DFU status
             again_q = [
                 inquirer.List(
