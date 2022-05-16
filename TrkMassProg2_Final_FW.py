@@ -34,32 +34,35 @@ def scanQRcodes():
             print("Duplicate QR detected, Please try again")
             qr = input("Scan Domino QR Code (enter 'q' when done scanning): ")
         qrCodes.append(qr)
-    print("Receiving data on each QR Code...")
-    for qr in qrCodes:
-        try:
-            # get data on entered qr code from database
-            url = "http://vmprdate.eastus.cloudapp.azure.com:9000/api/v1/manifest/?qrcode=" + qr
-            r = requests.get(url)
-            rawjson = json.loads(r.text)
 
-            # get data from entered qr code
-            data = []
-            if rawjson['error'] == False:
-                data = rawjson['data']
+    def get_macs(qr_list):
+        macids.clear()
+        print("Receiving data on each QR Code...")
+        for qr in qr_list:
+            try:
+                # get data on entered qr code from database
+                url = "http://vmprdate.eastus.cloudapp.azure.com:9000/api/v1/manifest/?qrcode=" + qr
+                r = requests.get(url)
+                rawjson = json.loads(r.text)
 
-                macid = data[0]['macid']
-                macqrpairs[qr] = macid
-                # print(macid)
-                if macid != "None" and macid != "":
-                    macids.append(macid)
-                else:
-                    print("Macid not found for ",qr)
-                    continue
-                serverResponse = json.dumps(data)
+                # get data from entered qr code
+                data = []
+                if rawjson['error'] == False:
+                    data = rawjson['data']
 
-        except Exception as e:
-            print("Error Occured\n")
-            print(e)
+                    macid = data[0]['macid']
+                    macqrpairs[qr] = macid
+                    # print(macid)
+                    if macid != "None" and macid != "":
+                        macids.append(macid)
+                    else:
+                        print("Macid not found for ",qr)
+                        continue
+                    serverResponse = json.dumps(data)
+
+            except Exception as e:
+                print("Error Occured\n")
+                print(e)
 def validateQR(qr):
     if len(qr) == 16 and qr.count('-') == 2 and qr[:2] == '18':
         return True
@@ -181,6 +184,7 @@ if __name__ == '__main__':
         sys_test_fails = []
         gotten_qrs = []
         scanQRcodes() #function to validate then append qr codes to list
+        get_macs(qrCodes)
         delete_records(qrCodes)
         for x in macids:
             macAddyincr.append(change_mac(x, 1)) ## increment macids by 1 in HEX
@@ -226,7 +230,7 @@ if __name__ == '__main__':
                 get_systest_records(passedqrs)
                 ask_finish = input('Hit q to run again or p to continue: ')
             if ask_finish == 'p':
-                print(list(set(qrCodes).difference(gotten_qrs)))
+                # print(list(set(qrCodes).difference(gotten_qrs)))
                 for i in list(set(qrCodes).difference(gotten_qrs)):
                     sys_test_fails.append(i)
                     print("--------------------- {} Fails, remove unit--------------------".format(i))
@@ -239,6 +243,7 @@ if __name__ == '__main__':
         sys_test_complete = input('Please remove failed units and input "q" to continue: ')
 
         if sys_test_complete == 'q' and flashed:
+            get_macs(qrCodes)
             passedmacs = manager.list()
             passedqrs.clear()
             failedqrs.clear()
