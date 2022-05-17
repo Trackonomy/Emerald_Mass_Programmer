@@ -193,11 +193,11 @@ if __name__ == '__main__':
         startTime = time.time() ## test start time
 
         os.system("cls")
-        print("/=======================================\\")
+        print("/================================================\\")
         print("| Starting TRACKONOMY Mass programmer (Final FW) |")
-        print("========================================/")
-        print("| 22/04/22 v1.0.0, TG |")
-        print("\\=====================/")
+        print("================================================/")
+        print("                | 22/04/22 v1.0.0, TG |          ")
+        print("\\=============================================/")
         print("")
         numNodes = 10 ## number of magnets turning on
 
