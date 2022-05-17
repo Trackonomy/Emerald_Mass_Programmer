@@ -140,9 +140,8 @@ def get_systest_records(qrs):
         dom_record = json.loads(test.text)
         if dom_record != []:
             gotten_qrs.append(dom_record[0]['qrcode'])
-            print(gotten_qrs)
-            print('\n')
-        print(dom_record)
+            print('QR code: {}\n'.format(str(dom_record[0]['qrcode'])))
+            print('blacklist: {}\n'.format(str(dom_record[0]['blacklisted'])))
 
 
 def run(on,off,start,finish,delaytime,start_stat=False,stop_stat=False): ## status for emags turning on and off triggered by Arduino (0, number of nodes, time emag is on)
