@@ -139,9 +139,10 @@ def get_systest_records(qrs):
 
         dom_record = json.loads(test.text)
         if dom_record != []:
-            gotten_qrs.append(dom_record[0]['qrcode'])
-            print('QR code: {}\n'.format(str(dom_record[0]['qrcode'])))
-            print('blacklist: {}\n'.format(str(dom_record[0]['blacklisted'])))
+            print('QR code: {} | blacklist: {} | Test Status: {} \n'.format(str(dom_record[0]['qrcode']),str(dom_record[0]['blacklisted']),str(dom_record[0]['status'])))
+            if dom_record[0]['status'] == 'success':
+                gotten_qrs.append(dom_record[0]['qrcode'])
+
 
 
 def run(on,off,start,finish,delaytime,start_stat=False,stop_stat=False): ## status for emags turning on and off triggered by Arduino (0, number of nodes, time emag is on)
@@ -172,7 +173,7 @@ if __name__ == '__main__':
         com = ['COM9', 'COM10', 'COM12', 'COM13', 'COM14', 'COM15', 'COM16', 'COM18', 'COM19','COM20']  ## com ports for NRF52-DK at SJ
         serPort = "COM4"  ## Serial port where arduino is connect
     elif facility_a['Facility'] == "Juarez":
-        com = ['COM3', 'COM4', 'COM5', 'COM7', 'COM8', 'COM9', 'COM10', 'COM11', 'COM12','COM13']  ## com ports for NRF52-DK at SJ
+        com = ['COM3', 'COM4', 'COM5', 'COM7', 'COM8', 'COM9', 'COM11', 'COM12','COM13','COM10']  ## com ports for NRF52-DK at SJ
         serPort = "COM6"  ## Serial port where arduino is connect
     while True:
         manager = Manager()
@@ -222,11 +223,13 @@ if __name__ == '__main__':
         print('Waiting for System test results........................................................... ')
         while True:
             get_systest_records(passedqrs)
+            print('Got Record for {}/{} unit(s)'.format(len(gotten_qrs),len(passedqrs)))
             ask_finish = input('Hit q to run again or p to continue: ')
             if ask_finish == 'q':
                 gotten_qrs.clear()
                 print('\n')
                 get_systest_records(passedqrs)
+                print('Got Record for {}/{} unit(s)\n'.format(len(gotten_qrs), len(passedqrs)))
                 ask_finish = input('Hit q to run again or p to continue: ')
             if ask_finish == 'p':
                 # print(list(set(qrCodes).difference(gotten_qrs)))
@@ -235,7 +238,6 @@ if __name__ == '__main__':
                     print("--------------------- {} Fails, remove unit--------------------".format(i))
                     print('\n')
                 qrCodes = list(set(qrCodes) - set(sys_test_fails))
-                print(qrCodes)
                 print('\n')
                 break
         # if len(gotten_qrs) == len(passdqrs):
