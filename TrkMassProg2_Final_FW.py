@@ -312,7 +312,7 @@ if __name__ == '__main__':
             macqrpairs.clear()  ## reset mac qr pair dict for next test
             passedqrs.clear()
             failedqrs.clear()
-            passedmacs.clear()
+            passedmacs[:] = []
             gotten_qrs.clear()
             flashed = False ## reset DFU status
             again_q = [
