@@ -91,10 +91,7 @@ def parallelDfu(passedmacs,chx, zipf, com, macAddy,active=True): ## function to 
 
                         raise Exception('Ch' + str(chx) + ' error ') ## error if DFU is not successful after 4 attempts
                 else:
-                    listOfKeys = getKeysByValue(macqrpairs, change_mac(macAddy, -1))
-                    for key in listOfKeys:
-                        # print(key)
-                        print('========================= ' + key + ' Passes =========================')
+                    passedmacs.append(change_mac(macAddy,-1))
                     break
             except:
                 # print('========================= ' + change_mac(macAddy, -1) + ' Fails =========================')
@@ -143,8 +140,8 @@ if __name__ == '__main__':
     facility_q =  [inquirer.List(
                 "Facility",
                 message="Select Facility you are at",
-                choices=["San Jose", "Juarez"],
-                default=["San Jose"],
+                choices=["Juarez", "San Jose"],
+                default=["Juarez"],
             ),
         ]
     facility_a = inquirer.prompt(facility_q) ## Ask user if they want to program more dominos
@@ -158,6 +155,11 @@ if __name__ == '__main__':
     while True:
         macAddyincr = [] ## macid hex increment initializer
         scanQRcodes() #function to validate then append qr codes to list
+        print('Starting in 5...............................')
+        print('Starting in 4...............................')
+        print('Starting in 3...............................')
+        print('Starting in 2...............................')
+        print('Starting in 1...............................')
         manager = Manager()
         passedmacs = manager.list()
         passedqrs = []
