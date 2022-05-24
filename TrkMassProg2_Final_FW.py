@@ -164,7 +164,7 @@ if __name__ == '__main__':
     facility_q =  [inquirer.List(
                 "Facility",
                 message="Select Facility you are at",
-                choices=["San Jose", "Juarez"],
+                choices=["Juarez", "San Jose"],
                 default=["Juarez"],
             ),
         ]
