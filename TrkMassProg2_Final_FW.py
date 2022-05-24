@@ -165,7 +165,7 @@ if __name__ == '__main__':
                 "Facility",
                 message="Select Facility you are at",
                 choices=["San Jose", "Juarez"],
-                default=["San Jose"],
+                default=["Juarez"],
             ),
         ]
     facility_a = inquirer.prompt(facility_q) ## Ask user if they want to program more dominos
