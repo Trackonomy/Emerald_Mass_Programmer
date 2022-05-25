@@ -13,7 +13,9 @@ from subprocess import Popen
 macids = [] ## initialize macid list
 qrCodes = [] ## initialize qr codes list
 listOfKeys = list()
+listOfKeys2 = list()
 macqrpairs = {} ## initialize mac qr pair dict
+qrorderpairs = {}
 flashed = False ## initialize DFU status
 fw = '' ## fw to be flash
 
@@ -34,6 +36,7 @@ def scanQRcodes():
             print("Duplicate QR detected, Please try again")
             qr = input("Scan Domino QR Code (enter 'q' when done scanning): ")
         qrCodes.append(qr)
+        qrorderpairs[len(qr)] = qr
 
 def get_macs(qr_list):
     macids.clear()
@@ -71,10 +74,11 @@ def validateQR(qr):
 
 def getKeysByValue(dictOfElements, valueToFind):
     listOfItems = dictOfElements.items()
-    for item  in listOfItems:
+    for item in listOfItems:
         if item[1] == valueToFind:
             listOfKeys.append(item[0])
-    return  listOfKeys
+    return listOfKeys
+
 # ======================================================================================================================
 
 def change_mac(mac, offset):
@@ -236,8 +240,10 @@ if __name__ == '__main__':
                 # print(list(set(qrCodes).difference(gotten_qrs)))
                 for i in list(set(qrCodes).difference(gotten_qrs)):
                     sys_test_fails.append(i)
-                    print("--------------------- {} Fails, remove unit--------------------".format(i))
+                    keys = [k for k, v in qrorderpairs.items() if v == i]
+                    print("--------------------- {} Fails, remove unit {}--------------------".format(i, keys[0]))
                     print('\n')
+                    keys.clear()
                 qrCodes = list(set(qrCodes) - set(sys_test_fails))
                 print('\n')
                 break
@@ -290,9 +296,13 @@ if __name__ == '__main__':
             passedqrs = listOfKeys
             failedqrs = list(set(qrCodes) - set(passedqrs))
             for key in passedqrs:
-                print('========================= ' + str(key) + ' Passes =========================')
+                passkeys = [k for k, v in qrorderpairs.items() if v == key]
+                print('========================= ' + str(key) + ' Passes  | Unit: ' + passkeys[0] + '=========================')
+                passkeys.clear()
             for key in failedqrs:
-                print('========================= ' + str(key) + ' Fails =========================')
+                failkeys = [k for k, v in qrorderpairs.items() if v == key]
+                print('========================= ' + str(key) + ' Fails | Unit: ' + failkeys[0] + '=========================')
+                failkeys.clear()
             # print(passedqrs)
             print(passedmacs)
             print("")

@@ -13,6 +13,7 @@ macids = [] ## initialize macid list
 qrCodes = [] ## initialize qr codes list
 listOfKeys = list()
 macqrpairs = {} ## initialize mac qr pair dict
+qrorderpairs = {}
 flashed = False ## initialize DFU status
 fw = '' ## fw to be flash
 
@@ -33,6 +34,7 @@ def scanQRcodes():
             print("Duplicate QR detected, Please try again")
             qr = input("Scan Domino QR Code (enter 'q' when done scanning): ")
         qrCodes.append(qr)
+        qrorderpairs[len(qr)] = qr
     print("Receiving data on each QR Code...")
     for qr in qrCodes:
         try:
@@ -200,9 +202,13 @@ if __name__ == '__main__':
             passedqrs = listOfKeys
             failedqrs = list(set(qrCodes) - set(passedqrs))
             for key in passedqrs:
-                print('========================= ' + str(key) + ' Passes =========================')
+                passkeys = [k for k, v in qrorderpairs.items() if v == key]
+                print('========================= ' + str(key) + ' Passes  | Unit: ' + passkeys[0] + '=========================')
+                passkeys.clear()
             for key in failedqrs:
-                print('========================= ' + str(key) + ' Fails =========================')
+                failkeys = [k for k, v in qrorderpairs.items() if v == key]
+                print('========================= ' + str(key) + ' Fails | Unit: ' + failkeys[0] + '=========================')
+                failkeys.clear()
             # print(passedqrs)
             print(passedmacs)
             endTime = round((time.time() - startTime), 2) ## get run time of programming
