@@ -248,7 +248,7 @@ if __name__ == '__main__':
                 for i in list(set(qrCodes).difference(gotten_qrs)):
                     sys_test_fails.append(i)
                     keys = [k for k, v in qrorderpairs.items() if v == i]
-                    print("--------------------- {} Fails, remove unit {}--------------------".format(i, keys[0]))
+                    print("--------------------- {} Fails, remove unit {}--------------------".format(i, str(keys[0])))
                     result_data = {
                         "UnitID": i,
 
@@ -319,7 +319,7 @@ if __name__ == '__main__':
             failedqrs = list(set(qrCodes) - set(passedqrs))
             for key in passedqrs:
                 passkeys = [k for k, v in qrorderpairs.items() if v == key]
-                print('========================= ' + str(key) + ' Passes  | Unit: ' + passkeys[0] + '=========================')
+                print('========================= ' + str(key) + ' Passes  | Unit: ' + str(passkeys[0]) + '=========================')
                 result_data = {
                     "UnitID": key,
 
@@ -338,7 +338,7 @@ if __name__ == '__main__':
                 passkeys.clear()
             for key in failedqrs:
                 failkeys = [k for k, v in qrorderpairs.items() if v == key]
-                print('========================= ' + str(key) + ' Fails | Unit: ' + failkeys[0] + '=========================')
+                print('========================= ' + str(key) + ' Fails | Unit: ' + str(failkeys[0]) + '=========================')
                 result_data = {
                     "UnitID": key,
 
