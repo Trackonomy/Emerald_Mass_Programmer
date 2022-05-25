@@ -162,7 +162,7 @@ if __name__ == '__main__':
         com = ['COM9', 'COM10', 'COM12', 'COM13', 'COM14', 'COM15', 'COM16', 'COM18', 'COM19','COM20']  ## com ports for NRF52-DK at SJ
         serPort = "COM17"  ## Serial port where arduino is connect
     elif facility_a['Facility'] == "Juarez":
-        com = ['COM3', 'COM4', 'COM5', 'COM7', 'COM8', 'COM9', 'COM13', 'COM11', 'COM12','COM10']  ## com ports for NRF52-DK at SJ
+        com = ['COM3', 'COM4', 'COM5', 'COM7', 'COM8', 'COM9', 'COM11', 'COM12','COM13','COM14']  ## com ports for NRF52-DK at SJ
         serPort = "COM6"  ## Serial port where arduino is connect
 
     while True:
