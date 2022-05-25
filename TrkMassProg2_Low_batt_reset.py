@@ -20,7 +20,7 @@ fw = '' ## fw to be flash
 def scanQRcodes():
     global macids, qrCodes, macqrpairs
     # qrCodes = list(df['QR Code'])
-
+    # length = 0
     while True:
         if len(qrCodes) == 10:
             break
@@ -33,8 +33,10 @@ def scanQRcodes():
         while qr in qrCodes:
             print("Duplicate QR detected, Please try again")
             qr = input("Scan Domino QR Code (enter 'q' when done scanning): ")
+        # length = length + 1
         qrCodes.append(qr)
-        qrorderpairs[len(qr)] = qr
+        qrorderpairs[len(qrCodes)] = qr
+        print(qrorderpairs)
     print("Receiving data on each QR Code...")
     for qr in qrCodes:
         try:

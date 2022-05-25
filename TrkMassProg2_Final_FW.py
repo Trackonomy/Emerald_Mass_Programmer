@@ -36,7 +36,7 @@ def scanQRcodes():
             print("Duplicate QR detected, Please try again")
             qr = input("Scan Domino QR Code (enter 'q' when done scanning): ")
         qrCodes.append(qr)
-        qrorderpairs[len(qr)] = qr
+        qrorderpairs[len(qrCodes)] = qr
 
 def get_macs(qr_list):
     macids.clear()
