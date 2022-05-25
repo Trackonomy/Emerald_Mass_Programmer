@@ -148,8 +148,6 @@ def get_systest_records(qrs):
             if dom_record[0]['status'] == 'success':
                 gotten_qrs.append(dom_record[0]['qrcode'])
 
-
-
 def run(on,off,start,finish,delaytime,start_stat=False,stop_stat=False): ## status for emags turning on and off triggered by Arduino (0, number of nodes, time emag is on)
     if start_stat:
         print("-----------------------------")
@@ -162,6 +160,15 @@ def run(on,off,start,finish,delaytime,start_stat=False,stop_stat=False): ## stat
             print("Power {} for node {}".format(off,y+1))
 
         print("-----------------------------")
+def databaseSendData(params):
+    MFDB_ENDPOINT = "http://manufscan.eastus.cloudapp.azure.com/manuf"
+    endpoint = MFDB_ENDPOINT
+    headers = {}
+    try:
+        r = requests.post(url = endpoint, headers = headers, data=params)
+        return r
+    except:
+        print('Something went wrong with sending data to MFDB...')
 
 if __name__ == '__main__':
     counter = 1
@@ -242,6 +249,21 @@ if __name__ == '__main__':
                     sys_test_fails.append(i)
                     keys = [k for k, v in qrorderpairs.items() if v == i]
                     print("--------------------- {} Fails, remove unit {}--------------------".format(i, keys[0]))
+                    result_data = {
+                        "UnitID": i,
+
+                        "MachineID": "Dom_Sys_Test",
+
+                        "UnitScanTime": datetime.now().isoformat()[:23],
+
+                        "MachineScanTime": datetime.now().isoformat()[:23],
+
+                        "OperatorID": str(macqrpairs[i]),
+
+                        "ActivityDetails": "Failed Sys Test"
+
+                    }
+                    __resp = databaseSendData(result_data)
                     print('\n')
                     keys.clear()
                 qrCodes = list(set(qrCodes) - set(sys_test_fails))
@@ -298,10 +320,40 @@ if __name__ == '__main__':
             for key in passedqrs:
                 passkeys = [k for k, v in qrorderpairs.items() if v == key]
                 print('========================= ' + str(key) + ' Passes  | Unit: ' + passkeys[0] + '=========================')
+                result_data = {
+                    "UnitID": key,
+
+                    "MachineID": "Dom_Sys_Test",
+
+                    "UnitScanTime": datetime.now().isoformat()[:23],
+
+                    "MachineScanTime": datetime.now().isoformat()[:23],
+
+                    "OperatorID": str(macqrpairs[key]),
+
+                    "ActivityDetails": "Pass"
+
+                }
+                __resp = databaseSendData(result_data)
                 passkeys.clear()
             for key in failedqrs:
                 failkeys = [k for k, v in qrorderpairs.items() if v == key]
                 print('========================= ' + str(key) + ' Fails | Unit: ' + failkeys[0] + '=========================')
+                result_data = {
+                    "UnitID": key,
+
+                    "MachineID": "Dom_Sys_Test",
+
+                    "UnitScanTime": datetime.now().isoformat()[:23],
+
+                    "MachineScanTime": datetime.now().isoformat()[:23],
+
+                    "OperatorID": str(macqrpairs[key]),
+
+                    "ActivityDetails": "Fail"
+
+                }
+                __resp = databaseSendData(result_data)
                 failkeys.clear()
             # print(passedqrs)
             print(passedmacs)

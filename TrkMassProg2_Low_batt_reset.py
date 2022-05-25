@@ -136,6 +136,17 @@ def run(on,off,start,finish,delaytime,start_stat=False,stop_stat=False): ## stat
 
         print("-----------------------------")
 
+# def databaseSendData(params):
+#     MFDB_ENDPOINT = "http://manufscan.eastus.cloudapp.azure.com/manuf"
+#     endpoint = MFDB_ENDPOINT
+#     headers = {}
+#     try:
+#         r = requests.post(url = endpoint, headers = headers, data=params)
+#         return r
+#     except:
+#         print('Something went wrong with sending data to MFDB...')
+
+
 if __name__ == '__main__':
     counter = 1
 
@@ -158,10 +169,15 @@ if __name__ == '__main__':
         macAddyincr = [] ## macid hex increment initializer
         scanQRcodes() #function to validate then append qr codes to list
         print('Starting in 5...............................')
+        time.sleep(1)
         print('Starting in 4...............................')
+        time.sleep(1)
         print('Starting in 3...............................')
+        time.sleep(1)
         print('Starting in 2...............................')
+        time.sleep(1)
         print('Starting in 1...............................')
+        time.sleep(1)
         manager = Manager()
         passedmacs = manager.list()
         passedqrs = []
