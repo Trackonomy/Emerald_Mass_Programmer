@@ -231,7 +231,7 @@ if __name__ == '__main__':
         for macs in passedmacs:
             getKeysByValue(macqrpairs, macs)
         passedqrs = listOfKeys
-
+        first_DFU_fail = list(set(qrCodes)-set(passedqrs))
         print('Waiting for System test results........................................................... ')
         while True:
             get_systest_records(passedqrs)
@@ -245,28 +245,51 @@ if __name__ == '__main__':
                 ask_finish = input('Hit q to run again or p to continue: ')
             if ask_finish == 'p':
                 # print(list(set(qrCodes).difference(gotten_qrs)))
-                for i in list(set(qrCodes).difference(gotten_qrs)):
-                    sys_test_fails.append(i)
-                    keys = [k for k, v in qrorderpairs.items() if v == i]
-                    print("--------------------- {} Fails, remove unit {}--------------------".format(i, str(keys[0])))
-                    result_data = {
-                        "UnitID": i,
+                if list(set(passedqrs).difference(gotten_qrs)) != []:
+                    for i in list(set(passedqrs).difference(gotten_qrs)):
+                        sys_test_fails.append(i)
+                        keys = [k for k, v in qrorderpairs.items() if v == i]
+                        print("--------------------- {} Fails System Test, remove unit {} --------------------".format(i, str(keys[0])))
+                        result_data = {
+                            "UnitID": i,
 
-                        "MachineID": "Dom_Sys_Test",
+                            "MachineID": "Dom_Sys_Test",
 
-                        "UnitScanTime": datetime.now().isoformat()[:23],
+                            "UnitScanTime": datetime.now().isoformat()[:23],
 
-                        "MachineScanTime": datetime.now().isoformat()[:23],
+                            "MachineScanTime": datetime.now().isoformat()[:23],
 
-                        "OperatorID": str(macqrpairs[i]),
+                            "OperatorID": str(macqrpairs[i]),
 
-                        "ActivityDetails": "Failed Sys Test"
+                            "ActivityDetails": "Failed-SysTest"
 
-                    }
-                    __resp = databaseSendData(result_data)
-                    print('\n')
-                    keys.clear()
+                        }
+                        __resp = databaseSendData(result_data)
+                        print('\n')
+                        keys.clear()
+                if first_DFU_fail != []:
+                    for i in first_DFU_fail:
+                        keys_again = [k for k, v in qrorderpairs.items() if v == i]
+                        print("--------------------- {} Fails First DFU, remove unit {} --------------------".format(i,str(keys_again[0])))
+                        result_data = {
+                            "UnitID": i,
+
+                            "MachineID": "Dom_Sys_Test",
+
+                            "UnitScanTime": datetime.now().isoformat()[:23],
+
+                            "MachineScanTime": datetime.now().isoformat()[:23],
+
+                            "OperatorID": str(macqrpairs[i]),
+
+                            "ActivityDetails": "Failed-SysTest"
+
+                        }
+                        __resp = databaseSendData(result_data)
+                        print('\n')
+                        keys_again.clear()
                 qrCodes = list(set(qrCodes) - set(sys_test_fails))
+                qrCodes = list(set(qrCodes) - set(first_DFU_fail))
                 print('\n')
                 break
         # if len(gotten_qrs) == len(passdqrs):
@@ -319,7 +342,7 @@ if __name__ == '__main__':
             failedqrs = list(set(qrCodes) - set(passedqrs))
             for key in passedqrs:
                 passkeys = [k for k, v in qrorderpairs.items() if v == key]
-                print('========================= ' + str(key) + ' Passes  | Unit: ' + str(passkeys[0]) + '=========================')
+                print('========================= ' + str(key) + ' Passes  | Unit: ' + str(passkeys[0]) + ' =========================')
                 result_data = {
                     "UnitID": key,
 
@@ -338,7 +361,7 @@ if __name__ == '__main__':
                 passkeys.clear()
             for key in failedqrs:
                 failkeys = [k for k, v in qrorderpairs.items() if v == key]
-                print('========================= ' + str(key) + ' Fails | Unit: ' + str(failkeys[0]) + '=========================')
+                print('========================= ' + str(key) + ' Fails | Unit: ' + str(failkeys[0]) + ' =========================')
                 result_data = {
                     "UnitID": key,
 
@@ -350,7 +373,7 @@ if __name__ == '__main__':
 
                     "OperatorID": str(macqrpairs[key]),
 
-                    "ActivityDetails": "Fail"
+                    "ActivityDetails": "Fail-Sleep"
 
                 }
                 __resp = databaseSendData(result_data)

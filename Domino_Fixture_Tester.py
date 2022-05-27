@@ -22,7 +22,7 @@ qrs = ["18-280222-E30030",
 
 "18-280222-E30227"]
 
-value = "18-280222-E30057"
+value = "18-280222-E30026"
 
 gotten_qrs = []
 #
@@ -30,15 +30,15 @@ gotten_qrs = []
 #
 #         print(requests.delete("https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + value))_
 
-for qr in qrs:
+# for qr in qrs:
         # while True:
-        test = requests.get("https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + qr)
+test = requests.get("https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + value)
 
-        dom_record = json.loads(test.text)
-        # if dom_record != []:
-        #         gotten_qrs.append(dom_record[0]['qrcode'])
-        #         print(gotten_qrs)
-        print(dom_record)
+dom_record = json.loads(test.text)
+# if dom_record != []:
+#         gotten_qrs.append(dom_record[0]['qrcode'])
+#         print(gotten_qrs)
+print(dom_record)
         # time.sleep(30)
 
 

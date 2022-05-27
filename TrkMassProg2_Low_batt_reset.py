@@ -221,11 +221,11 @@ if __name__ == '__main__':
             failedqrs = list(set(qrCodes) - set(passedqrs))
             for key in passedqrs:
                 passkeys = [k for k, v in qrorderpairs.items() if v == key]
-                print('========================= ' + str(key) + ' Passes  | Unit: ' + str(passkeys[0]) + '=========================')
+                print('========================= ' + str(key) + ' Passes  | Unit: ' + str(passkeys[0]) + ' =========================')
                 passkeys.clear()
             for key in failedqrs:
                 failkeys = [k for k, v in qrorderpairs.items() if v == key]
-                print('========================= ' + str(key) + ' Fails | Unit: ' + str(failkeys[0]) + '=========================')
+                print('========================= ' + str(key) + ' Fails | Unit: ' + str(failkeys[0]) + ' =========================')
                 failkeys.clear()
             # print(passedqrs)
             print(passedmacs)
