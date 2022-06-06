@@ -369,7 +369,7 @@ if __name__ == '__main__':
                 passkeys = [k for k, v in qrorderpairs.items() if v == key]
                 print('========================= ' + str(key) + ' Passes  | Unit: ' + str(passkeys[0]) + ' =========================')
                 test = requests.get(
-                    "https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + i)
+                    "https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + key)
 
                 dom_record = json.loads(test.text)
                 result_data = {

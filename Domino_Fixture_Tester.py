@@ -22,7 +22,7 @@ qrs = ["18-280222-E30030",
 
 "18-280222-E30227"]
 
-value = "18-280222-E30026"
+value = "18-280222-E29925"
 
 gotten_qrs = []
 #
@@ -38,7 +38,8 @@ dom_record = json.loads(test.text)
 # if dom_record != []:
 #         gotten_qrs.append(dom_record[0]['qrcode'])
 #         print(gotten_qrs)
-print(dom_record[0]['qrcode'][0])
+if dom_record != []:
+    print(dom_record)
         # time.sleep(30)
 
 
