@@ -38,7 +38,7 @@ dom_record = json.loads(test.text)
 # if dom_record != []:
 #         gotten_qrs.append(dom_record[0]['qrcode'])
 #         print(gotten_qrs)
-print(dom_record)
+print(dom_record[0]['qrcode'][0])
         # time.sleep(30)
 
 

@@ -250,27 +250,52 @@ if __name__ == '__main__':
                         sys_test_fails.append(i)
                         keys = [k for k, v in qrorderpairs.items() if v == i]
                         print("--------------------- {} Fails System Test, remove unit {} --------------------".format(i, str(keys[0])))
-                        result_data = {
-                            "UnitID": i,
+                        test = requests.get(
+                            "https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + i)
 
-                            "MachineID": "Dom_Sys_Test",
+                        dom_record = json.loads(test.text)
+                        if dom_record !=[]:
+                            result_data = {
+                                "UnitID": i,
 
-                            "UnitScanTime": datetime.now().isoformat()[:23],
+                                "MachineID": "Dom_Sys_Test",
 
-                            "MachineScanTime": datetime.now().isoformat()[:23],
+                                "UnitScanTime": datetime.now().isoformat()[:23],
 
-                            "OperatorID": str(macqrpairs[i]),
+                                "MachineScanTime": datetime.now().isoformat()[:23],
 
-                            "ActivityDetails": "Failed-SysTest"
+                                "OperatorID": str(macqrpairs[i]),
 
-                        }
-                        __resp = databaseSendData(result_data)
+                                "ActivityDetails": "F|{}|{}".format(dom_record[0]['rssi'], dom_record[0]['failed_reason'][0])
+
+                            }
+                            __resp = databaseSendData(result_data)
+                        else:
+                            result_data = {
+                                "UnitID": i,
+
+                                "MachineID": "Dom_Sys_Test",
+
+                                "UnitScanTime": datetime.now().isoformat()[:23],
+
+                                "MachineScanTime": datetime.now().isoformat()[:23],
+
+                                "OperatorID": str(macqrpairs[i]),
+
+                                "ActivityDetails": "F|{}".format('No Record')
+
+                            }
+                            __resp = databaseSendData(result_data)
                         print('\n')
                         keys.clear()
                 if first_DFU_fail != []:
                     for i in first_DFU_fail:
                         keys_again = [k for k, v in qrorderpairs.items() if v == i]
                         print("--------------------- {} Fails First DFU, remove unit {} --------------------".format(i,str(keys_again[0])))
+                        test = requests.get(
+                            "https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + i)
+
+                        dom_record = json.loads(test.text)
                         result_data = {
                             "UnitID": i,
 
@@ -282,7 +307,7 @@ if __name__ == '__main__':
 
                             "OperatorID": str(macqrpairs[i]),
 
-                            "ActivityDetails": "Failed-SysTest"
+                            "ActivityDetails": 'Failed First DFU'
 
                         }
                         __resp = databaseSendData(result_data)
@@ -343,6 +368,10 @@ if __name__ == '__main__':
             for key in passedqrs:
                 passkeys = [k for k, v in qrorderpairs.items() if v == key]
                 print('========================= ' + str(key) + ' Passes  | Unit: ' + str(passkeys[0]) + ' =========================')
+                test = requests.get(
+                    "https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + i)
+
+                dom_record = json.loads(test.text)
                 result_data = {
                     "UnitID": key,
 
@@ -354,7 +383,7 @@ if __name__ == '__main__':
 
                     "OperatorID": str(macqrpairs[key]),
 
-                    "ActivityDetails": "Pass"
+                    "ActivityDetails": "P|{}".format(dom_record[0]['rssi'])
 
                 }
                 __resp = databaseSendData(result_data)
@@ -362,6 +391,9 @@ if __name__ == '__main__':
             for key in failedqrs:
                 failkeys = [k for k, v in qrorderpairs.items() if v == key]
                 print('========================= ' + str(key) + ' Fails | Unit: ' + str(failkeys[0]) + ' =========================')
+                test = requests.get(
+                    "https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + key)
+                dom_record = json.loads(test.text)
                 result_data = {
                     "UnitID": key,
 
@@ -373,7 +405,7 @@ if __name__ == '__main__':
 
                     "OperatorID": str(macqrpairs[key]),
 
-                    "ActivityDetails": "Fail-Sleep"
+                    "ActivityDetails": "F-Sleep|{}|{}".format(dom_record[0]['rssi'], dom_record[0]['failed_reason'][0])
 
                 }
                 __resp = databaseSendData(result_data)
