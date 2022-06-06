@@ -24,7 +24,7 @@ def scanQRcodes():
     # qrCodes = list(df['QR Code'])
 
     while True:
-        if len(qrCodes) == 10:
+        if len(qrCodes) == 4:
             break
         qr = input("Scan Domino QR Code (enter 'q' when done scanning): ")
         if qr == 'q':
@@ -173,20 +173,8 @@ def databaseSendData(params):
 if __name__ == '__main__':
     counter = 1
 
-    facility_q =  [inquirer.List(
-                "Facility",
-                message="Select Facility you are at",
-                choices=["Juarez", "San Jose"],
-                default=["Juarez"],
-            ),
-        ]
-    facility_a = inquirer.prompt(facility_q) ## Ask user if they want to program more dominos
-    if facility_a['Facility'] == "San Jose":
-        com = ['COM9', 'COM10', 'COM12', 'COM13', 'COM14', 'COM15', 'COM16', 'COM18', 'COM19','COM20']  ## com ports for NRF52-DK at SJ
-        serPort = "COM4"  ## Serial port where arduino is connect
-    elif facility_a['Facility'] == "Juarez":
-        com = ['COM3', 'COM4', 'COM5', 'COM7', 'COM8', 'COM9', 'COM11', 'COM12','COM13','COM14']  ## com ports for NRF52-DK at SJ
-        serPort = "COM6"  ## Serial port where arduino is connect
+    com = ['COM5', 'COM6', 'COM7', 'COM8'] #, 'COM14', 'COM15', 'COM16', 'COM18', 'COM19','COM20']  ## com ports for NRF52-DK at SJ
+    serPort = "COM4"  ## Serial port where arduino is connect
     while True:
         manager = Manager()
         passedmacs = manager.list()
@@ -206,12 +194,12 @@ if __name__ == '__main__':
 
         os.system("cls")
         print("/================================================\\")
-        print("| Starting TRACKONOMY Mass programmer (Final FW) |")
+        print("| Starting TRACKONOMY Mass programmer (Engineering) |")
         print("================================================/")
-        print("                | 22/04/22 v1.0.0, TG |          ")
+        print("                | 02/06/22 v1.0.0, TG |          ")
         print("\\=============================================/")
         print("")
-        numNodes = 10 ## number of magnets turning on
+        numNodes = 4 ## number of magnets turning on
 
         baudRate = 9600 ## set baud rate
         ser = serial.Serial(serPort, baudRate)
@@ -397,6 +385,7 @@ if __name__ == '__main__':
             macids.clear() ## reset macid list for next test
             qrCodes.clear()  ## reset qr codes list for next test
             macqrpairs.clear()  ## reset mac qr pair dict for next test
+            qrorderpairs.clear()
             passedqrs.clear()
             failedqrs.clear()
             passedmacs[:] = []
