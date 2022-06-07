@@ -254,38 +254,38 @@ if __name__ == '__main__':
                             "https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + i)
 
                         dom_record = json.loads(test.text)
-                        # if dom_record !=[]:
-                        result_data = {
-                            "UnitID": i,
+                        if dom_record !=[]:
+                            result_data = {
+                                "UnitID": i,
 
-                            "MachineID": "Dom_Sys_Test",
+                                "MachineID": "Dom_Sys_Test",
 
-                            "UnitScanTime": datetime.now().isoformat()[:23],
+                                "UnitScanTime": datetime.now().isoformat()[:23],
 
-                            "MachineScanTime": datetime.now().isoformat()[:23],
+                                "MachineScanTime": datetime.now().isoformat()[:23],
 
-                            "OperatorID": str(macqrpairs[i]),
+                                "OperatorID": str(macqrpairs[i]),
 
-                            "ActivityDetails": "F|{}|{}".format(dom_record[0]['rssi'], dom_record[0]['failed_reason'][0])
+                                "ActivityDetails": "F|{}|{}".format(dom_record[0]['rssi'], dom_record[0]['failed_reason'][0])
 
-                        }
-                        __resp = databaseSendData(result_data)
-                        # else:
-                        #     result_data = {
-                        #         "UnitID": i,
-                        #
-                        #         "MachineID": "Dom_Sys_Test",
-                        #
-                        #         "UnitScanTime": datetime.now().isoformat()[:23],
-                        #
-                        #         "MachineScanTime": datetime.now().isoformat()[:23],
-                        #
-                        #         "OperatorID": str(macqrpairs[i]),
-                        #
-                        #         "ActivityDetails": "F|{}".format('No Record')
-                        #
-                        #     }
-                        #     __resp = databaseSendData(result_data)
+                            }
+                            __resp = databaseSendData(result_data)
+                        else:
+                            result_data = {
+                                "UnitID": i,
+
+                                "MachineID": "Dom_Sys_Test",
+
+                                "UnitScanTime": datetime.now().isoformat()[:23],
+
+                                "MachineScanTime": datetime.now().isoformat()[:23],
+
+                                "OperatorID": str(macqrpairs[i]),
+
+                                "ActivityDetails": "F|{}".format('No Record')
+
+                            }
+                            __resp = databaseSendData(result_data)
                         print('\n')
                         keys.clear()
                 if first_DFU_fail != []:
@@ -326,6 +326,7 @@ if __name__ == '__main__':
             passedmacs = manager.list()
             passedqrs.clear()
             failedqrs.clear()
+            listOfKeys.clear()
             ser.write(b'1')
             for i in range(3):
                 run("on","off",0,numNodes, 2, True,True)
@@ -360,7 +361,7 @@ if __name__ == '__main__':
             endTime = round((time.time() - startTime), 2) ## get run time of programming
 
             print(endTime, "seconds elapsed.")
-            print("==============================================Test 2 results================================================")
+            print("==============================================DFU results================================================")
             for macs in passedmacs:
                 getKeysByValue(macqrpairs, macs)
             passedqrs = listOfKeys
@@ -394,21 +395,38 @@ if __name__ == '__main__':
                 test = requests.get(
                     "https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + key)
                 dom_record = json.loads(test.text)
-                result_data = {
-                    "UnitID": key,
+                try:
+                    result_data = {
+                        "UnitID": key,
 
-                    "MachineID": "Dom_Sys_Test",
+                        "MachineID": "Dom_Sys_Test",
 
-                    "UnitScanTime": datetime.now().isoformat()[:23],
+                        "UnitScanTime": datetime.now().isoformat()[:23],
 
-                    "MachineScanTime": datetime.now().isoformat()[:23],
+                        "MachineScanTime": datetime.now().isoformat()[:23],
 
-                    "OperatorID": str(macqrpairs[key]),
+                        "OperatorID": str(macqrpairs[key]),
 
-                    "ActivityDetails": "F-Sleep|{}|{}".format(dom_record[0]['rssi'], dom_record[0]['failed_reason'][0])
+                        "ActivityDetails": "F-Sleep|{}|{}".format(dom_record[0]['rssi'], dom_record[0]['failed_reason'][0])
 
-                }
-                __resp = databaseSendData(result_data)
+                    }
+                    __resp = databaseSendData(result_data)
+                except:
+                    result_data = {
+                        "UnitID": key,
+
+                        "MachineID": "Dom_Sys_Test",
+
+                        "UnitScanTime": datetime.now().isoformat()[:23],
+
+                        "MachineScanTime": datetime.now().isoformat()[:23],
+
+                        "OperatorID": str(macqrpairs[key]),
+
+                        "ActivityDetails": "F-Sleep|{}|{}".format(dom_record[0]['rssi'],'Failed 2nd DFU')
+
+                    }
+                    __resp = databaseSendData(result_data)
                 failkeys.clear()
             # print(passedqrs)
             print(passedmacs)
