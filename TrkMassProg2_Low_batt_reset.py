@@ -198,7 +198,7 @@ if __name__ == '__main__':
         print("| 22/04/22 v1.0.0, TG |")
         print("\\=====================/")
         print("")
-        numNodes = 4 ## number of magnets turning on
+        numNodes = len(macids) ## number of magnets turning on
 
         baudRate = 9600 ## set baud rate
         ser = serial.Serial(serPort, baudRate)

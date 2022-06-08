@@ -196,7 +196,7 @@ if __name__ == '__main__':
         # serPort = "COM4"  ## Serial port where arduino is connect
         com = ['COM5','COM6','COM7','COM8']  ## com ports for NRF52-DK at SJ
         serPort = "COM4"  ## Serial port where arduino is connect
-        # log_dir =
+        log_dir = r"C:\\Users\\TanishGupta\\OneDrive - Trackonomy\\Desktop"
     elif facility_a['Facility'] == "Juarez":
         com = ['COM3', 'COM4', 'COM5', 'COM7', 'COM8', 'COM9', 'COM11', 'COM12','COM13','COM14']  ## com ports for NRF52-DK at SJ
         serPort = "COM6"  ## Serial port where arduino is connect
@@ -233,7 +233,7 @@ if __name__ == '__main__':
         print("                | 22/04/22 v1.0.0, TG |          ")
         print("\\=============================================/")
         print("")
-        numNodes = 10## number of magnets turning on
+        numNodes = len(macids)## number of magnets turning on
 
         baudRate = 9600 ## set baud rate
         ser = serial.Serial(serPort, baudRate)
