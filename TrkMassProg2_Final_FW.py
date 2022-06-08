@@ -9,6 +9,16 @@ import multiprocessing
 import inquirer
 from multiprocessing import Process, Manager
 from subprocess import Popen
+import csv
+
+try:
+    with open('Log'+datetime.today().strftime('%Y%m%d')+'.csv','r+', newline='') as csvfile:
+        csv.reader(csvfile)
+except:
+    with open('Log' + datetime.today().strftime('%Y%m%d') + '.csv', 'a+', newline='') as csvfile:
+        topfields = ['qrcode','macid','Pass/Fail','RSSI','Failure Reason']
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow(topfields)
 
 macids = [] ## initialize macid list
 qrCodes = [] ## initialize qr codes list
@@ -66,6 +76,7 @@ def get_macs(qr_list):
         except Exception as e:
             print("Error Occured\n")
             print(e)
+
 def validateQR(qr):
     if len(qr) == 16 and qr.count('-') == 2 and qr[:2] == '18':
         return True
@@ -107,22 +118,20 @@ def parallelDfu(passedmacs,chx, zipf, com, macAddy,active=True): ## function to 
                 print("#####An exception occurred with Ch " + str(chx))
     i = 0
 
-def runDFU(test_macs):
+def runDFU():
     global flashed, fw
     flashed = False
     DFU_processes = {} ## initialize dict to create DFU process based on # of qrCodes scanned
     fw = 'Em61x_MHM_LoRaWAN_V2.0.1_Final.zip' ## final fw
     # fw = 'Bat_Test.zip' ## low batt fw
 
-    for p in range(len(test_macs)):
-        DFU_processes["p{0}".format(p)] = multiprocessing.Process(name="p{0}".format(p), target=parallelDfu, args=(passedmacs,p+1, fw, com[p], test_macs[p], True)) ## create variables for multiprocessing based on len of macid
+    for p in range(len(macAddyincr)):
+        DFU_processes["p{0}".format(p)] = multiprocessing.Process(name="p{0}".format(p), target=parallelDfu, args=(passedmacs,p+1, fw, com[p], macAddyincr[p], True)) ## create variables for multiprocessing based on len of macid
         (DFU_processes["p{0}".format(p)]).daemon = True
         (DFU_processes["p{0}".format(p)]).start()
 
-    for o in range(len(test_macs)):
+    for o in range(len(macAddyincr)):
         (DFU_processes["p{0}".format(o)]).join()
-
-
 
     flashed = True ## finished flashing
     return flashed
@@ -171,6 +180,14 @@ def databaseSendData(params):
     except:
         print('Something went wrong with sending data to MFDB...')
 
+def csv_write(test_data):
+    with open('Log' + datetime.today().strftime('%Y%m%d') + '.csv', 'a+', newline='') as csvfile:
+        # topfields = ['qrcode','macid','Pass/Fail','RSSI','Failure Reason']
+        csvwriter = csv.writer(csvfile)
+        # csvwriter.writerow(topfields)
+        csvwriter.writerow(test_data)
+
+
 if __name__ == '__main__':
     counter = 1
 
@@ -203,8 +220,6 @@ if __name__ == '__main__':
         delete_records(qrCodes)
         for x in macids:
             macAddyincr.append(change_mac(x, 1)) ## increment macids by 1 in HEX
-        # print(macids)
-        # print(macAddyincr)
         startTime = time.time() ## test start time
 
         os.system("cls")
@@ -225,11 +240,7 @@ if __name__ == '__main__':
         print('Putting Nodes into DFU mode')
         ser.write(b'0') ## Communicate with arduino to turn emags on
         run("on","off", 0,numNodes, 20, True,True) ## run status of emags on for 20s then off
-        # y = ser.readline()
-        # string_y = y.decode()
-        # stripped_string_y = string_y.strip()
-        # print(stripped_string_y)
-        runDFU(macAddyincr) ## pass macids obtained from scanned QRs code to nrfutil commands to DFU as multiprocesses
+        runDFU() ## pass macids obtained from scanned QRs code to nrfutil commands to DFU as multiprocesses
         # print("==============================================Test 1 results================================================")
         for macs in passedmacs:
             getKeysByValue(macqrpairs, macs)
@@ -251,13 +262,13 @@ if __name__ == '__main__':
                 if list(set(passedqrs).difference(gotten_qrs)) != []:
                     for i in list(set(passedqrs).difference(gotten_qrs)):
                         sys_test_fails.append(i)
-                        keys = [k for k, v in qrorderpairs.items() if v == i]
-                        print("--------------------- {} Fails System Test, remove unit {} --------------------".format(i, str(keys[0])))
                         test = requests.get(
                             "https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + i)
 
                         dom_record = json.loads(test.text)
                         if dom_record !=[]:
+                            keys = [k for k, v in qrorderpairs.items() if v == i]
+                            print("--------------------- {} Fails System Test | Reason: {} | remove unit {} --------------------".format( i, dom_record[0]['failed_reason'],str(keys[0])))
                             result_data = {
                                 "UnitID": i,
 
@@ -272,9 +283,13 @@ if __name__ == '__main__':
                                 "ActivityDetails": "F|{}|{}".format(dom_record[0]['rssi'], dom_record[0]['failed_reason'][0])
 
                             }
-                            print(result_data)
-                            # __resp = databaseSendData(result_data)
+                            csv_write([i,macqrpairs[i],'Fail',dom_record[0]['rssi'],dom_record[0]['failed_reason']])
+                            # print(result_data)
+                            __resp = databaseSendData(result_data)
                         else:
+                            keys = [k for k, v in qrorderpairs.items() if v == i]
+                            print("--------------------- {} Fails System Test | Reason: {} | remove unit {} --------------------".format(i,'No Record', str(keys[0])))
+
                             result_data = {
                                 "UnitID": i,
 
@@ -289,14 +304,15 @@ if __name__ == '__main__':
                                 "ActivityDetails": "F|{}".format('No Record')
 
                             }
-                            # __resp = databaseSendData(result_data)
-                            print(result_data)
+                            csv_write([i, macqrpairs[i], 'Fail', 'NA', 'No Record Found'])
+                            __resp = databaseSendData(result_data)
+                            # print(result_data)
                         print('\n')
                         keys.clear()
                 if first_DFU_fail != []:
                     for i in first_DFU_fail:
                         keys_again = [k for k, v in qrorderpairs.items() if v == i]
-                        print("--------------------- {} Fails First DFU, remove unit {} --------------------".format(i,str(keys_again[0])))
+                        print("--------------------- {} Fails First DFU | remove unit {} --------------------".format(i,str(keys_again[0])))
                         test = requests.get(
                             "https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + i)
 
@@ -315,20 +331,19 @@ if __name__ == '__main__':
                             "ActivityDetails": 'Failed First DFU'
 
                         }
-                        # __resp = databaseSendData(result_data)
-                        print(result_data)
+                        csv_write([i, macqrpairs[i], 'Fail', 'NA', 'Failed First DFU'])
+                        __resp = databaseSendData(result_data)
+                        # print(result_data)
                         print('\n')
                         keys_again.clear()
                 qrCodes = list(set(qrCodes) - set(sys_test_fails))
                 qrCodes = list(set(qrCodes) - set(first_DFU_fail))
                 print('\n')
                 break
-        # if len(gotten_qrs) == len(passdqrs):
-        #     print('Obtained record for all passed QRs')
+
         sys_test_complete = input('Please remove failed units and input "q" to continue: ')
 
         if sys_test_complete == 'q' and flashed:
-            # get_macs(qrCodes)
             macAddyincr.clear()
             for x in qrCodes:
                 macAddyincr.append(change_mac(macqrpairs[x], 1))  ## increment macids by 1 in HEX
@@ -342,12 +357,9 @@ if __name__ == '__main__':
                 run("on","off",0,numNodes, 2, True,True)
                 time.sleep(2)
             ser.write(b'2')
-            # x = ser.readline()
-            # string_x = x.decode()
-            # stripped_string_x = string_x.strip()
-            # print(stripped_string_x)
+
             if macAddyincr:
-                runDFU(macAddyincr)
+                runDFU()
 
                 if flashed:
                     print("flashing complete.")
@@ -359,17 +371,6 @@ if __name__ == '__main__':
                 pass
             ser.close()  ## close serial port
 
-        # x = ser.readline() ##  read data sent from Arduino telling python it's ready for putting devices to sleep
-        # string_x = x.decode()
-        # stripped_string_x = string_x.strip() ## getting read arduino message into form that can be read as a string
-        # if stripped_string_x == "1" and flashed == True: ## If arduino is ready and flashing (DFU) is complete
-        #     print("flashing complete.")
-        #     print('Sleeping Nodes')
-        #     sendToArduino(str(1)) ## Communicate with arduino to turn emags on
-        #     # print('Sleeping Nodes')
-        #     time.sleep(10)
-        #     run("off","off",0,numNodes,0.01,True, False )
-        #     ser.close() ## close serial port
             endTime = round((time.time() - startTime), 2) ## get run time of programming
 
             print(endTime, "seconds elapsed.")
@@ -399,16 +400,17 @@ if __name__ == '__main__':
                     "ActivityDetails": "P|{}".format(dom_record[0]['rssi'])
 
                 }
+                csv_write([key, macqrpairs[key], 'Pass', dom_record[0]['rssi'], 'NA'])
                 # __resp = databaseSendData(result_data)
                 print(result_data)
                 passkeys.clear()
             for key in failedqrs:
                 failkeys = [k for k, v in qrorderpairs.items() if v == key]
-                print('========================= ' + str(key) + ' Fails | Unit: ' + str(failkeys[0]) + ' =========================')
                 test = requests.get(
                     "https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + key)
                 dom_record = json.loads(test.text)
                 try:
+                    print('========================= {} Fails | Reason: {} | Unit: {} ========================='.format(str(key),dom_record[0]['failed_reason'],str(failkeys[0])))
                     result_data = {
                         "UnitID": key,
 
@@ -423,9 +425,11 @@ if __name__ == '__main__':
                         "ActivityDetails": "F-Sleep|{}|{}".format(dom_record[0]['rssi'], dom_record[0]['failed_reason'][0])
 
                     }
-                    # __resp = databaseSendData(result_data)
-                    print(result_data)
+                    csv_write([key, macqrpairs[Key], 'Fail', dom_record[0]['rssi'], '{} | {}'.format(dom_record[0]['failed_reason'],'Fail Sleep')])
+                    __resp = databaseSendData(result_data)
+                    # print(result_data)
                 except:
+                    print('========================= {} Fails | Reason: {} | Unit: {} ========================='.format(str(key), 'Failed 2nd DFU', str(failkeys[0])))
                     result_data = {
                         "UnitID": key,
 
@@ -440,8 +444,9 @@ if __name__ == '__main__':
                         "ActivityDetails": "F-Sleep|{}|{}".format(dom_record[0]['rssi'],'Failed 2nd DFU')
 
                     }
-                    # __resp = databaseSendData(result_data)
-                    print(result_data)
+                    csv_write([key, macqrpairs[key], 'Fail', dom_record[0]['rssi'], 'Failed 2nd DFU'])
+                    __resp = databaseSendData(result_data)
+                    # print(result_data)
                 failkeys.clear()
             # print(passedqrs)
             print(passedmacs)
