@@ -405,8 +405,8 @@ if __name__ == '__main__':
 
                 }
                 csv_write([key, macqrpairs[key], 'Pass', dom_record[0]['rssi'], 'NA'])
-                # __resp = databaseSendData(result_data)
-                print(result_data)
+                __resp = databaseSendData(result_data)
+                # print(result_data)
                 passkeys.clear()
             for key in failedqrs:
                 failkeys = [k for k, v in qrorderpairs.items() if v == key]
