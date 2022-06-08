@@ -273,6 +273,17 @@ if __name__ == '__main__':
                         if dom_record !=[]:
                             keys = [k for k, v in qrorderpairs.items() if v == i]
                             print("--------------------- {} Fails System Test | Reason: {} | remove unit {} --------------------".format( i, dom_record[0]['failed_reason'],str(keys[0])))
+
+                            failed_reason_str = dom_record[0]['failed_reason'].replace(" ", "")
+                            reason_list = failed_reason_str.split(":")
+                            reasons = ""
+                            for n in range(1, len(reason_list), 2):
+                                if "F" in reason_list[n]:
+                                    if reasons == "":
+                                        reasons = reason_list[n-1][0] + "1"
+                                    else:
+                                        reasons += "|" + reason_list[n-1][0] + "1"
+
                             result_data = {
                                 "UnitID": i,
 
@@ -284,7 +295,7 @@ if __name__ == '__main__':
 
                                 "OperatorID": str(macqrpairs[i]),
 
-                                "ActivityDetails": "F|{}|{}".format(dom_record[0]['rssi'], dom_record[0]['failed_reason'][0])
+                                "ActivityDetails": "F|{}|{}".format(dom_record[0]['rssi'], reasons)
 
                             }
                             csv_write([i,macqrpairs[i],'Fail',dom_record[0]['rssi'],dom_record[0]['failed_reason']])
@@ -415,6 +426,17 @@ if __name__ == '__main__':
                 dom_record = json.loads(test.text)
                 try:
                     print('========================= {} Fails | Reason: {} | Unit: {} ========================='.format(str(key),dom_record[0]['failed_reason'],str(failkeys[0])))
+
+                    failed_reason_str = dom_record[0]['failed_reason'].replace(" ", "")
+                    reason_list = failed_reason_str.split(":")
+                    reasons = ""
+                    for n in range(1, len(reason_list), 2):
+                        if "F" in reason_list[n]:
+                            if reasons == "":
+                                reasons = reason_list[n - 1][0] + "1"
+                            else:
+                                reasons += "|" + reason_list[n - 1][0] + "1"
+
                     result_data = {
                         "UnitID": key,
 
@@ -426,7 +448,7 @@ if __name__ == '__main__':
 
                         "OperatorID": str(macqrpairs[key]),
 
-                        "ActivityDetails": "F-Sleep|{}|{}".format(dom_record[0]['rssi'], dom_record[0]['failed_reason'][0])
+                        "ActivityDetails": "F-Sleep|{}|{}".format(dom_record[0]['rssi'], reasons)
 
                     }
                     csv_write([key, macqrpairs[Key], 'Fail', dom_record[0]['rssi'], '{} | {}'.format(dom_record[0]['failed_reason'],'Fail Sleep')])
