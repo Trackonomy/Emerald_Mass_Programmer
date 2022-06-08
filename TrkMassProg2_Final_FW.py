@@ -100,25 +100,26 @@ def parallelDfu(passedmacs,chx, zipf, com, macAddy,active=True): ## function to 
                         raise Exception('Ch' + str(chx) + ' error ') ## error if DFU is not successful after 4 attempts
                 else:
                     passedmacs.append(change_mac(macAddy,-1))
+                    # print(change_mac(macAddy,-1))
                     break
             except:
                 # print('========================= ' + change_mac(macAddy, -1) + ' Fails =========================')
                 print("#####An exception occurred with Ch " + str(chx))
     i = 0
 
-def runDFU():
+def runDFU(test_macs):
     global flashed, fw
     flashed = False
     DFU_processes = {} ## initialize dict to create DFU process based on # of qrCodes scanned
     fw = 'Em61x_MHM_LoRaWAN_V2.0.1_Final.zip' ## final fw
     # fw = 'Bat_Test.zip' ## low batt fw
 
-    for p in range(len(macids)):
-        DFU_processes["p{0}".format(p)] = multiprocessing.Process(name="p{0}".format(p), target=parallelDfu, args=(passedmacs,p+1, fw, com[p], macAddyincr[p], True)) ## create variables for multiprocessing based on len of macid
+    for p in range(len(test_macs)):
+        DFU_processes["p{0}".format(p)] = multiprocessing.Process(name="p{0}".format(p), target=parallelDfu, args=(passedmacs,p+1, fw, com[p], test_macs[p], True)) ## create variables for multiprocessing based on len of macid
         (DFU_processes["p{0}".format(p)]).daemon = True
         (DFU_processes["p{0}".format(p)]).start()
 
-    for o in range(len(macids)):
+    for o in range(len(test_macs)):
         (DFU_processes["p{0}".format(o)]).join()
 
 
@@ -182,7 +183,9 @@ if __name__ == '__main__':
         ]
     facility_a = inquirer.prompt(facility_q) ## Ask user if they want to program more dominos
     if facility_a['Facility'] == "San Jose":
-        com = ['COM9', 'COM10', 'COM12', 'COM13', 'COM14', 'COM15', 'COM16', 'COM18', 'COM19','COM20']  ## com ports for NRF52-DK at SJ
+        # com = ['COM9', 'COM10', 'COM12', 'COM13', 'COM14', 'COM15', 'COM16', 'COM18', 'COM19','COM20']  ## com ports for NRF52-DK at SJ
+        # serPort = "COM4"  ## Serial port where arduino is connect
+        com = ['COM5','COM6','COM7','COM8']  ## com ports for NRF52-DK at SJ
         serPort = "COM4"  ## Serial port where arduino is connect
     elif facility_a['Facility'] == "Juarez":
         com = ['COM3', 'COM4', 'COM5', 'COM7', 'COM8', 'COM9', 'COM11', 'COM12','COM13','COM14']  ## com ports for NRF52-DK at SJ
@@ -211,7 +214,7 @@ if __name__ == '__main__':
         print("                | 22/04/22 v1.0.0, TG |          ")
         print("\\=============================================/")
         print("")
-        numNodes = 10 ## number of magnets turning on
+        numNodes = 10## number of magnets turning on
 
         baudRate = 9600 ## set baud rate
         ser = serial.Serial(serPort, baudRate)
@@ -226,7 +229,7 @@ if __name__ == '__main__':
         # string_y = y.decode()
         # stripped_string_y = string_y.strip()
         # print(stripped_string_y)
-        runDFU() ## pass macids obtained from scanned QRs code to nrfutil commands to DFU as multiprocesses
+        runDFU(macAddyincr) ## pass macids obtained from scanned QRs code to nrfutil commands to DFU as multiprocesses
         # print("==============================================Test 1 results================================================")
         for macs in passedmacs:
             getKeysByValue(macqrpairs, macs)
@@ -269,7 +272,8 @@ if __name__ == '__main__':
                                 "ActivityDetails": "F|{}|{}".format(dom_record[0]['rssi'], dom_record[0]['failed_reason'][0])
 
                             }
-                            __resp = databaseSendData(result_data)
+                            print(result_data)
+                            # __resp = databaseSendData(result_data)
                         else:
                             result_data = {
                                 "UnitID": i,
@@ -285,7 +289,8 @@ if __name__ == '__main__':
                                 "ActivityDetails": "F|{}".format('No Record')
 
                             }
-                            __resp = databaseSendData(result_data)
+                            # __resp = databaseSendData(result_data)
+                            print(result_data)
                         print('\n')
                         keys.clear()
                 if first_DFU_fail != []:
@@ -310,7 +315,8 @@ if __name__ == '__main__':
                             "ActivityDetails": 'Failed First DFU'
 
                         }
-                        __resp = databaseSendData(result_data)
+                        # __resp = databaseSendData(result_data)
+                        print(result_data)
                         print('\n')
                         keys_again.clear()
                 qrCodes = list(set(qrCodes) - set(sys_test_fails))
@@ -322,8 +328,12 @@ if __name__ == '__main__':
         sys_test_complete = input('Please remove failed units and input "q" to continue: ')
 
         if sys_test_complete == 'q' and flashed:
-            get_macs(qrCodes)
-            passedmacs = manager.list()
+            # get_macs(qrCodes)
+            macAddyincr.clear()
+            for x in qrCodes:
+                macAddyincr.append(change_mac(macqrpairs[x], 1))  ## increment macids by 1 in HEX
+            print(macAddyincr)
+            passedmacs[:] = []
             passedqrs.clear()
             failedqrs.clear()
             listOfKeys.clear()
@@ -336,16 +346,18 @@ if __name__ == '__main__':
             # string_x = x.decode()
             # stripped_string_x = string_x.strip()
             # print(stripped_string_x)
-            runDFU()
+            if macAddyincr:
+                runDFU(macAddyincr)
 
-            if flashed:
-                print("flashing complete.")
-                print('Sleeping Nodes')
-                time.sleep(20)
-                ser.write(b'3')
-                run("off", "off", 0, numNodes, 0, True, False)
-                ser.close()  ## close serial port
-
+                if flashed:
+                    print("flashing complete.")
+                    print('Sleeping Nodes')
+                    time.sleep(20)
+                    ser.write(b'3')
+                    run("off", "off", 0, numNodes, 0, True, False)
+            else:
+                pass
+            ser.close()  ## close serial port
 
         # x = ser.readline() ##  read data sent from Arduino telling python it's ready for putting devices to sleep
         # string_x = x.decode()
@@ -387,7 +399,8 @@ if __name__ == '__main__':
                     "ActivityDetails": "P|{}".format(dom_record[0]['rssi'])
 
                 }
-                __resp = databaseSendData(result_data)
+                # __resp = databaseSendData(result_data)
+                print(result_data)
                 passkeys.clear()
             for key in failedqrs:
                 failkeys = [k for k, v in qrorderpairs.items() if v == key]
@@ -410,7 +423,8 @@ if __name__ == '__main__':
                         "ActivityDetails": "F-Sleep|{}|{}".format(dom_record[0]['rssi'], dom_record[0]['failed_reason'][0])
 
                     }
-                    __resp = databaseSendData(result_data)
+                    # __resp = databaseSendData(result_data)
+                    print(result_data)
                 except:
                     result_data = {
                         "UnitID": key,
@@ -426,7 +440,8 @@ if __name__ == '__main__':
                         "ActivityDetails": "F-Sleep|{}|{}".format(dom_record[0]['rssi'],'Failed 2nd DFU')
 
                     }
-                    __resp = databaseSendData(result_data)
+                    # __resp = databaseSendData(result_data)
+                    print(result_data)
                 failkeys.clear()
             # print(passedqrs)
             print(passedmacs)
@@ -451,6 +466,7 @@ if __name__ == '__main__':
             failedqrs.clear()
             passedmacs[:] = []
             gotten_qrs.clear()
+            macAddyincr.clear()
             flashed = False ## reset DFU status
             again_q = [
                 inquirer.List(

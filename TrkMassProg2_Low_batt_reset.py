@@ -161,8 +161,10 @@ if __name__ == '__main__':
         ]
     facility_a = inquirer.prompt(facility_q) ## Ask user if they want to program more dominos
     if facility_a['Facility'] == "San Jose":
-        com = ['COM9', 'COM10', 'COM12', 'COM13', 'COM14', 'COM15', 'COM16', 'COM18', 'COM19','COM20']  ## com ports for NRF52-DK at SJ
-        serPort = "COM17"  ## Serial port where arduino is connect
+        # com = ['COM9', 'COM10', 'COM12', 'COM13', 'COM14', 'COM15', 'COM16', 'COM18', 'COM19','COM20']  ## com ports for NRF52-DK at SJ
+        # serPort = "COM17"  ## Serial port where arduino is connect
+        com = ['COM5','COM6','COM7','COM8']  ## com ports for NRF52-DK at SJ
+        serPort = "COM4"  ## Serial port where arduino is connect
     elif facility_a['Facility'] == "Juarez":
         com = ['COM3', 'COM4', 'COM5', 'COM7', 'COM8', 'COM9', 'COM11', 'COM12','COM13','COM14']  ## com ports for NRF52-DK at SJ
         serPort = "COM6"  ## Serial port where arduino is connect
@@ -196,7 +198,7 @@ if __name__ == '__main__':
         print("| 22/04/22 v1.0.0, TG |")
         print("\\=====================/")
         print("")
-        numNodes = 10 ## number of magnets turning on
+        numNodes = 4 ## number of magnets turning on
 
         baudRate = 9600 ## set baud rate
         ser = serial.Serial(serPort, baudRate)
@@ -205,7 +207,7 @@ if __name__ == '__main__':
         time.sleep(2) ## delay to get arduino ready
         # sendToArduino(str(len(macids)))
         print('Putting Nodes into DFU mode')
-        sendToArduino(str(1)) ## Communicate with arduino to turn emags on
+        ser.write(b'4') ## Communicate with arduino to turn emags on
         for i in range (3):
             run("on","off", 0,numNodes, 1.5, True,True) ## run status of emags on for 20s then off
             time.sleep(1.5)
