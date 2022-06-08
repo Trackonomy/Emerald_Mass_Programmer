@@ -11,14 +11,6 @@ from multiprocessing import Process, Manager
 from subprocess import Popen
 import csv
 
-try:
-    with open('Log'+datetime.today().strftime('%Y%m%d')+'.csv','r+', newline='') as csvfile:
-        csv.reader(csvfile)
-except:
-    with open('Log' + datetime.today().strftime('%Y%m%d') + '.csv', 'a+', newline='') as csvfile:
-        topfields = ['qrcode','macid','Pass/Fail','RSSI','Failure Reason']
-        csvwriter = csv.writer(csvfile)
-        csvwriter.writerow(topfields)
 
 macids = [] ## initialize macid list
 qrCodes = [] ## initialize qr codes list
@@ -181,7 +173,7 @@ def databaseSendData(params):
         print('Something went wrong with sending data to MFDB...')
 
 def csv_write(test_data):
-    with open('Log' + datetime.today().strftime('%Y%m%d') + '.csv', 'a+', newline='') as csvfile:
+    with open(log_dir+'\\Log' + datetime.today().strftime('%Y%m%d') + '.csv', 'a+', newline='') as csvfile:
         # topfields = ['qrcode','macid','Pass/Fail','RSSI','Failure Reason']
         csvwriter = csv.writer(csvfile)
         # csvwriter.writerow(topfields)
@@ -204,9 +196,21 @@ if __name__ == '__main__':
         # serPort = "COM4"  ## Serial port where arduino is connect
         com = ['COM5','COM6','COM7','COM8']  ## com ports for NRF52-DK at SJ
         serPort = "COM4"  ## Serial port where arduino is connect
+        # log_dir =
     elif facility_a['Facility'] == "Juarez":
         com = ['COM3', 'COM4', 'COM5', 'COM7', 'COM8', 'COM9', 'COM11', 'COM12','COM13','COM14']  ## com ports for NRF52-DK at SJ
         serPort = "COM6"  ## Serial port where arduino is connect
+        log_dir = r"C:\\Users\\PRODUCCION ISM\\Desktop\\Logs"
+
+    try:
+        with open(log_dir+'\\Log' + datetime.today().strftime('%Y%m%d') + '.csv', 'r+', newline='') as csvfile:
+            csv.reader(csvfile)
+    except:
+        with open(log_dir+'\\Log' + datetime.today().strftime('%Y%m%d') + '.csv', 'a+', newline='') as csvfile:
+            topfields = ['qrcode', 'macid', 'Pass/Fail', 'RSSI', 'Failure Reason']
+            csvwriter = csv.writer(csvfile)
+            csvwriter.writerow(topfields)
+
     while True:
         manager = Manager()
         passedmacs = manager.list()
@@ -452,7 +456,7 @@ if __name__ == '__main__':
             print(passedmacs)
             print("")
             lines = ["Test # {}".format(counter), '# of Domino(s): {}'.format(len(macids)),'Time taken: {}'.format(endTime),'FW: {}'.format(fw),'###############################'] ## data for loggin
-            with open('Log_'+datetime.today().strftime('%Y%m%d')+'.txt', 'a+') as f: ## open txt file to write log to
+            with open(log_dir+'\\Log_'+datetime.today().strftime('%Y%m%d')+'.txt', 'a+') as f: ## open txt file to write log to
                 for line in lines:
                     f.write(line) ## write the data in log file
                     f.write('\n')
