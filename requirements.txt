@@ -1,8 +1,3 @@
 requests
-json
-serial
-time
-os
-subprocess
-multiprocessing
+pyserial
 inquirer
