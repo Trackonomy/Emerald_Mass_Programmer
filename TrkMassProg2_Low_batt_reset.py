@@ -1,4 +1,3 @@
-<<<<<<< HEAD:TrkMassProg2_Low_batt_reset.py
 import requests
 import json
 import serial
@@ -252,7 +251,7 @@ if __name__ == '__main__':
             again_a = inquirer.prompt(again_q) ## Ask user if they want to program more dominos
             if again_a['Again'] == "N":
                 break
-=======
+                
 import requests
 import json
 import serial
@@ -468,4 +467,3 @@ if __name__ == '__main__':
         again_a = inquirer.prompt(again_q) ## Ask user if they want to program more dominos
         if again_a['Again'] == "N":
             break
->>>>>>> 3730405e679ddc8f3c7a431723e0e730f68d66ba:TrkMassProg2.py
