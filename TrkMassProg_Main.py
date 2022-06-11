@@ -18,14 +18,16 @@ if __name__ == '__main__':
         q_prog =  [inquirer.List(
                         "Prog",
                         message="Select your Program",
-                        choices=["Final FW", "Low Battery Reset"],
+                        choices=["Full System Test", "Low Battery Reset", "DFU and Sleep Test"],
                         default=["Final FW"],
                     ),
                 ]
 
         a_prog = inquirer.prompt(q_prog)
 
-        if a_prog["Prog"] == "Final FW":
+        if a_prog["Prog"] == "Full System Test":
             subprocess.call("TrkMassProg2_Final_FW.py", shell=True)
-        else:
+        elif a_prog["Prog"] == "Low Battery Reset":
             subprocess.call("TrkMassProg2_Low_batt_reset.py", shell=True)
+        else:
+            subprocess.call("TrkMassProg2_Just_Sleep.py", shell=True)

@@ -1,6 +1,7 @@
 import requests
 import json
 import serial
+from serial import *
 import time
 from datetime import datetime
 import os
@@ -15,7 +16,6 @@ import csv
 macids = [] ## initialize macid list
 qrCodes = [] ## initialize qr codes list
 listOfKeys = list()
-listOfKeys2 = list()
 macqrpairs = {} ## initialize mac qr pair dict
 qrorderpairs = {}
 flashed = False ## initialize DFU status
@@ -139,12 +139,14 @@ def delete_records(qrs):
     for value in qrs:
             print('-----------------Deleting recording for {}'.format(value))
             print(requests.delete("https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + value))
+
 def get_systest_records(qrs):
     gotten_qrs.clear()
     for qr in qrs:
         test = requests.get("https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + qr)
 
         dom_record = json.loads(test.text)
+
         if dom_record != []:
             print('QR code: {} | blacklist: {} | Test Status: {} \n'.format(str(dom_record[0]['qrcode']),str(dom_record[0]['blacklisted']),str(dom_record[0]['status'])))
             if dom_record[0]['status'] == 'success':
@@ -162,6 +164,7 @@ def run(on,off,start,finish,delaytime,start_stat=False,stop_stat=False): ## stat
             print("Power {} for node {}".format(off,y+1))
 
         print("-----------------------------")
+
 def databaseSendData(params):
     MFDB_ENDPOINT = "http://manufscan.eastus.cloudapp.azure.com/manuf"
     endpoint = MFDB_ENDPOINT
@@ -194,9 +197,9 @@ if __name__ == '__main__':
     if facility_a['Facility'] == "San Jose":
         # com = ['COM9', 'COM10', 'COM12', 'COM13', 'COM14', 'COM15', 'COM16', 'COM18', 'COM19','COM20']  ## com ports for NRF52-DK at SJ
         # serPort = "COM4"  ## Serial port where arduino is connect
-        com = ['COM5','COM6','COM7','COM8']  ## com ports for NRF52-DK at SJ
-        serPort = "COM4"  ## Serial port where arduino is connect
-        log_dir = r"C:\\Users\\TanishGupta\\OneDrive - Trackonomy\\Desktop"
+        com = ['COM4', 'COM5', 'COM6', 'COM7']  ## com ports for NRF52-DK at SJ
+        serPort = "COM3"  ## Serial port where arduino is connect
+        log_dir = r"C:\\Users\\AsalVaghefzadeh\\Desktop"
     elif facility_a['Facility'] == "Juarez":
         com = ['COM3', 'COM4', 'COM5', 'COM7', 'COM8', 'COM9', 'COM11', 'COM12','COM13','COM14']  ## com ports for NRF52-DK at SJ
         serPort = "COM6"  ## Serial port where arduino is connect
@@ -240,7 +243,7 @@ if __name__ == '__main__':
         print("Serial port " + serPort + " opened  Baudrate " + str(baudRate))
 
         time.sleep(2) ## delay to get arduino ready
-        # sendToArduino(str(len(macids)))
+        #sendToArduino(str(len(macids)))
         print('Putting Nodes into DFU mode')
         ser.write(b'0') ## Communicate with arduino to turn emags on
         run("on","off", 0,numNodes, 20, True,True) ## run status of emags on for 20s then off
@@ -467,7 +470,7 @@ if __name__ == '__main__':
 
                         "OperatorID": str(macqrpairs[key]),
 
-                        "ActivityDetails": "F-Sleep|{}|{}".format(dom_record[0]['rssi'],'Failed 2nd DFU')
+                        "ActivityDetails": "F-Sleep|{}|{}".format(dom_record[0]['rssi'], 'Failed 2nd DFU')
 
                     }
                     csv_write([key, macqrpairs[key], 'Fail', dom_record[0]['rssi'], 'Failed 2nd DFU'])
@@ -489,6 +492,7 @@ if __name__ == '__main__':
                     f.write('{} Fails'.format(i))
                     f.write('\n')
                 f.write('############################################')
+
             counter = counter + 1
             macids.clear() ## reset macid list for next test
             qrCodes.clear()  ## reset qr codes list for next test
