@@ -147,7 +147,7 @@ def get_systest_records(qrs):
         dom_record = json.loads(test.text)
         if dom_record != []:
             print('QR code: {} | blacklist: {} | Test Status: {} | rssi: {} \n'.format(str(dom_record[0]['qrcode']),str(dom_record[0]['blacklisted']),str(dom_record[0]['status']),str(dom_record[0]['rssi'])))
-            if dom_record[0]['status'] == 'success' and dom_record[0]['rssi']>-70:
+            if dom_record[0]['status'] == 'success' and dom_record[0]['rssi'] > -70:
                 gotten_qrs.append(dom_record[0]['qrcode'])
 
 def run(on,off,start,finish,delaytime,start_stat=False,stop_stat=False): ## status for emags turning on and off triggered by Arduino (0, number of nodes, time emag is on)
@@ -191,19 +191,22 @@ if __name__ == '__main__':
             ),
         ]
     facility_a = inquirer.prompt(facility_q) ## Ask user if they want to program more dominos
+    log_dir = None
+    serPort = None
+    
     if facility_a['Facility'] == "San Jose":
         # com = ['COM9', 'COM10', 'COM12', 'COM13', 'COM14', 'COM15', 'COM16', 'COM18', 'COM19','COM20']  ## com ports for NRF52-DK at SJ
         # serPort = "COM4"  ## Serial port where arduino is connect
-        com = ['COM5','COM6','COM7','COM8']  ## com ports for NRF52-DK at SJ
-        serPort = "COM4"  ## Serial port where arduino is connect
-        log_dir = r"C:\\Users\\TanishGupta\\OneDrive - Trackonomy\\Desktop"
+        com = ['COM4', 'COM5','COM6','COM7']  ## com ports for NRF52-DK at SJ
+        serPort = "COM3"  ## Serial port where arduino is connect
+        log_dir = r"C:\\Users\\AsalVaghefzadeh\\Desktop"
     elif facility_a['Facility'] == "Juarez":
         com = ['COM3', 'COM4', 'COM5', 'COM7', 'COM8', 'COM9', 'COM11', 'COM12','COM13','COM14']  ## com ports for NRF52-DK at SJ
         serPort = "COM6"  ## Serial port where arduino is connect
         log_dir = r"C:\\Users\\PRODUCCION ISM\\Desktop\\Logs"
 
     try:
-        with open(log_dir+'\\Log' + datetime.today().strftime('%Y%m%d') + '.csv', 'r+', newline='') as csvfile:
+        with open(log_dir + '\\Log' + datetime.today().strftime('%Y%m%d') + '.csv', 'r+', newline='') as csvfile:
             csv.reader(csvfile)
     except:
         with open(log_dir+'\\Log' + datetime.today().strftime('%Y%m%d') + '.csv', 'a+', newline='') as csvfile:
@@ -249,6 +252,7 @@ if __name__ == '__main__':
         for macs in passedmacs:
             getKeysByValue(macqrpairs, macs)
         passedqrs = listOfKeys
+
         first_DFU_fail = list(set(qrCodes)-set(passedqrs))
         print('Waiting for System test results........................................................... ')
         while True:
@@ -264,16 +268,19 @@ if __name__ == '__main__':
             if ask_finish == 'p':
                 # print(list(set(qrCodes).difference(gotten_qrs)))
                 if list(set(passedqrs).difference(gotten_qrs)) != []:
+
                     for i in list(set(passedqrs).difference(gotten_qrs)):
                         sys_test_fails.append(i)
                         test = requests.get(
                             "https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + i)
 
                         dom_record = json.loads(test.text)
+
                         if dom_record !=[]:
                             keys = [k for k, v in qrorderpairs.items() if v == i]
+
                             if dom_record[0]['failed_reason'] != None:
-                                print("--------------------- {} Fails System Test | Reason: {} | remove unit {} --------------------".format( i, dom_record[0]['failed_reason'],str(keys[0])))
+                                print("--------------------- {} Fails System Test | Reason: {} | remove unit {} --------------------".format( i, dom_record[0]['failed_reason'], str(keys[0])))
 
                                 failed_reason_str = dom_record[0]['failed_reason'].replace(" ", "")
                                 reason_list = failed_reason_str.split(":")
@@ -281,9 +288,9 @@ if __name__ == '__main__':
                                 for n in range(1, len(reason_list), 2):
                                     if "F" in reason_list[n]:
                                         if reasons == "":
-                                            reasons = reason_list[n-1][0] + "1"
+                                            reasons = reason_list[n-1][0]
                                         else:
-                                            reasons += "|" + reason_list[n-1][0] + "1"
+                                            reasons += "|" + reason_list[n-1][0]
 
                                 result_data = {
                                     "UnitID": i,
@@ -299,12 +306,12 @@ if __name__ == '__main__':
                                     "ActivityDetails": "F|{}|{}".format(dom_record[0]['rssi'], reasons)
 
                                 }
-                                csv_write([i,macqrpairs[i],'Fail',dom_record[0]['rssi'],dom_record[0]['failed_reason']])
+                                csv_write([i,macqrpairs[i],'Fail',dom_record[0]['rssi'], dom_record[0]['failed_reason']])
                                 # print(result_data)
                                 __resp = databaseSendData(result_data)
                             else:
                                 print(
-                                    "--------------------- {} Fails System Test | Reason: {} | remove unit {} --------------------".format( i, dom_record[0]['rssi'], str(keys[0])))
+                                    "--------------------- {} Fails System Test | Reason: {} | remove unit {} --------------------".format(i, dom_record[0]['rssi'], str(keys[0])))
 
                                 result_data = {
                                     "UnitID": i,
@@ -317,7 +324,7 @@ if __name__ == '__main__':
 
                                     "OperatorID": str(macqrpairs[i]),
 
-                                    "ActivityDetails": "F|{}|{}".format(dom_record[0]['rssi'], 'rssi F')
+                                    "ActivityDetails": "F|{}|{}".format(dom_record[0]['rssi'], 'r')
 
                                 }
                                 csv_write([i, macqrpairs[i], 'Fail', dom_record[0]['rssi'], 'rssi Fail'])
@@ -338,7 +345,7 @@ if __name__ == '__main__':
 
                                 "OperatorID": str(macqrpairs[i]),
 
-                                "ActivityDetails": "F|{}".format('No Record')
+                                "ActivityDetails": "F|FT"
 
                             }
                             csv_write([i, macqrpairs[i], 'Fail', 'NA', 'No Record Found'])
@@ -365,7 +372,7 @@ if __name__ == '__main__':
 
                             "OperatorID": str(macqrpairs[i]),
 
-                            "ActivityDetails": 'Failed First DFU'
+                            "ActivityDetails": 'F|STDFU'
 
                         }
                         csv_write([i, macqrpairs[i], 'Fail', 'NA', 'Failed First DFU'])
@@ -470,14 +477,14 @@ if __name__ == '__main__':
 
                         "OperatorID": str(macqrpairs[key]),
 
-                        "ActivityDetails": "F-Sleep|{}|{}".format(dom_record[0]['rssi'], reasons)
+                        "ActivityDetails": "F|STDFU|{}|{}".format(dom_record[0]['rssi'], reasons)
 
                     }
                     csv_write([key, macqrpairs[Key], 'Fail', dom_record[0]['rssi'], '{} | {}'.format(dom_record[0]['failed_reason'],'Fail Sleep')])
                     __resp = databaseSendData(result_data)
                     # print(result_data)
                 except:
-                    print('========================= {} Fails | Reason: {} | Unit: {} ========================='.format(str(key), 'Failed 2nd DFU', str(failkeys[0])))
+                    print('========================= {} Fails | Reason: {} | Unit: {} ========================='.format(str(key), 'SLDFU', str(failkeys[0])))
                     result_data = {
                         "UnitID": key,
 
@@ -489,10 +496,10 @@ if __name__ == '__main__':
 
                         "OperatorID": str(macqrpairs[key]),
 
-                        "ActivityDetails": "F-Sleep|{}|{}".format(dom_record[0]['rssi'],'Failed 2nd DFU')
+                        "ActivityDetails": "F|STDFU|{}|{}".format(dom_record[0]['rssi'], 'SLDFU')
 
                     }
-                    csv_write([key, macqrpairs[key], 'Fail', dom_record[0]['rssi'], 'Failed 2nd DFU'])
+                    csv_write([key, macqrpairs[key], 'Fail', dom_record[0]['rssi'], 'SLDFU'])
                     __resp = databaseSendData(result_data)
                     # print(result_data)
                 failkeys.clear()
