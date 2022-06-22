@@ -146,8 +146,8 @@ def get_systest_records(qrs):
 
         dom_record = json.loads(test.text)
         if dom_record != []:
-            print('QR code: {} | blacklist: {} | Test Status: {} \n'.format(str(dom_record[0]['qrcode']),str(dom_record[0]['blacklisted']),str(dom_record[0]['status'])))
-            if dom_record[0]['status'] == 'success':
+            print('QR code: {} | blacklist: {} | Test Status: {} | rssi: {} \n'.format(str(dom_record[0]['qrcode']),str(dom_record[0]['blacklisted']),str(dom_record[0]['status']),str(dom_record[0]['rssi'])))
+            if dom_record[0]['status'] == 'success' and dom_record[0]['rssi']>-70:
                 gotten_qrs.append(dom_record[0]['qrcode'])
 
 def run(on,off,start,finish,delaytime,start_stat=False,stop_stat=False): ## status for emags turning on and off triggered by Arduino (0, number of nodes, time emag is on)
@@ -272,35 +272,57 @@ if __name__ == '__main__':
                         dom_record = json.loads(test.text)
                         if dom_record !=[]:
                             keys = [k for k, v in qrorderpairs.items() if v == i]
-                            print("--------------------- {} Fails System Test | Reason: {} | remove unit {} --------------------".format( i, dom_record[0]['failed_reason'],str(keys[0])))
+                            if dom_record[0]['failed_reason'] != None:
+                                print("--------------------- {} Fails System Test | Reason: {} | remove unit {} --------------------".format( i, dom_record[0]['failed_reason'],str(keys[0])))
 
-                            failed_reason_str = dom_record[0]['failed_reason'].replace(" ", "")
-                            reason_list = failed_reason_str.split(":")
-                            reasons = ""
-                            for n in range(1, len(reason_list), 2):
-                                if "F" in reason_list[n]:
-                                    if reasons == "":
-                                        reasons = reason_list[n-1][0] + "1"
-                                    else:
-                                        reasons += "|" + reason_list[n-1][0] + "1"
+                                failed_reason_str = dom_record[0]['failed_reason'].replace(" ", "")
+                                reason_list = failed_reason_str.split(":")
+                                reasons = ""
+                                for n in range(1, len(reason_list), 2):
+                                    if "F" in reason_list[n]:
+                                        if reasons == "":
+                                            reasons = reason_list[n-1][0] + "1"
+                                        else:
+                                            reasons += "|" + reason_list[n-1][0] + "1"
 
-                            result_data = {
-                                "UnitID": i,
+                                result_data = {
+                                    "UnitID": i,
 
-                                "MachineID": "Dom_Sys_Test",
+                                    "MachineID": "Dom_Sys_Test",
 
-                                "UnitScanTime": datetime.now().isoformat()[:23],
+                                    "UnitScanTime": datetime.now().isoformat()[:23],
 
-                                "MachineScanTime": datetime.now().isoformat()[:23],
+                                    "MachineScanTime": datetime.now().isoformat()[:23],
 
-                                "OperatorID": str(macqrpairs[i]),
+                                    "OperatorID": str(macqrpairs[i]),
 
-                                "ActivityDetails": "F|{}|{}".format(dom_record[0]['rssi'], reasons)
+                                    "ActivityDetails": "F|{}|{}".format(dom_record[0]['rssi'], reasons)
 
-                            }
-                            csv_write([i,macqrpairs[i],'Fail',dom_record[0]['rssi'],dom_record[0]['failed_reason']])
-                            # print(result_data)
-                            __resp = databaseSendData(result_data)
+                                }
+                                csv_write([i,macqrpairs[i],'Fail',dom_record[0]['rssi'],dom_record[0]['failed_reason']])
+                                # print(result_data)
+                                __resp = databaseSendData(result_data)
+                            else:
+                                print(
+                                    "--------------------- {} Fails System Test | Reason: {} | remove unit {} --------------------".format( i, dom_record[0]['rssi'], str(keys[0])))
+
+                                result_data = {
+                                    "UnitID": i,
+
+                                    "MachineID": "Dom_Sys_Test",
+
+                                    "UnitScanTime": datetime.now().isoformat()[:23],
+
+                                    "MachineScanTime": datetime.now().isoformat()[:23],
+
+                                    "OperatorID": str(macqrpairs[i]),
+
+                                    "ActivityDetails": "F|{}|{}".format(dom_record[0]['rssi'], 'rssi F')
+
+                                }
+                                csv_write([i, macqrpairs[i], 'Fail', dom_record[0]['rssi'], 'rssi Fail'])
+                                # print(result_data)
+                                __resp = databaseSendData(result_data)
                         else:
                             keys = [k for k, v in qrorderpairs.items() if v == i]
                             print("--------------------- {} Fails System Test | Reason: {} | remove unit {} --------------------".format(i,'No Record', str(keys[0])))

@@ -65,6 +65,11 @@ for qr in qrs:
 #         print(gotten_qrs)
 # if dom_record != []:
     print(dom_record)
+    print(type(dom_record[0]['rssi']))
+    if dom_record[0]['status'] == 'success' and dom_record[0]['rssi']>-85:
+        print('Pass')
+    if dom_record[0]['failed_reason'] == None:
+        print('None')
         # time.sleep(30)
 
 
