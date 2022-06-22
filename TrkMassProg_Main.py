@@ -15,7 +15,7 @@ from subprocess import Popen
 
 if __name__ == '__main__':
     while True:
-        q_prog =  [inquirer.List(
+        q_prog = [inquirer.List(
                         "Prog",
                         message="Select your Program",
                         choices=["Full System Test", "Low Battery Reset", "DFU and Sleep Test"],

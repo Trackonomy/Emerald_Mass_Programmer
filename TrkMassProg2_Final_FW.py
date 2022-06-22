@@ -206,7 +206,7 @@ if __name__ == '__main__':
         log_dir = r"C:\\Users\\PRODUCCION ISM\\Desktop\\Logs"
 
     try:
-        with open(log_dir+'\\Log' + datetime.today().strftime('%Y%m%d') + '.csv', 'r+', newline='') as csvfile:
+        with open(log_dir + '\\Log' + datetime.today().strftime('%Y%m%d') + '.csv', 'r+', newline='') as csvfile:
             csv.reader(csvfile)
     except:
         with open(log_dir+'\\Log' + datetime.today().strftime('%Y%m%d') + '.csv', 'a+', newline='') as csvfile:
