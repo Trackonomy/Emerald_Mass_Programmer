@@ -199,7 +199,7 @@ if __name__ == '__main__':
         # serPort = "COM4"  ## Serial port where arduino is connect
         com = ['COM4', 'COM5','COM6','COM7']  ## com ports for NRF52-DK at SJ
         serPort = "COM3"  ## Serial port where arduino is connect
-        log_dir = r"C:\\Users\\AsalVaghefzadeh\\Desktop"
+        log_dir = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
     elif facility_a['Facility'] == "Juarez":
         com = ['COM3', 'COM4', 'COM5', 'COM7', 'COM8', 'COM9', 'COM11', 'COM12','COM13','COM14']  ## com ports for NRF52-DK at SJ
         serPort = "COM6"  ## Serial port where arduino is connect
