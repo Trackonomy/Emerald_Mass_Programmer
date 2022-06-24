@@ -22,7 +22,7 @@ def scanQRcodes():
     # qrCodes = list(df['QR Code'])
     # length = 0
     while True:
-        if len(qrCodes) == 10:
+        if len(qrCodes) == 15:
             break
         qr = input("Scan Domino QR Code (enter 'q' when done scanning): ")
         if qr == 'q':
@@ -163,8 +163,8 @@ if __name__ == '__main__':
     if facility_a['Facility'] == "San Jose":
         # com = ['COM9', 'COM10', 'COM12', 'COM13', 'COM14', 'COM15', 'COM16', 'COM18', 'COM19','COM20']  ## com ports for NRF52-DK at SJ
         # serPort = "COM17"  ## Serial port where arduino is connect
-        com = ['COM5','COM6','COM7','COM8']  ## com ports for NRF52-DK at SJ
-        serPort = "COM4"  ## Serial port where arduino is connect
+        com = ['COM5','COM6','COM7','COM8','COM14','COM30','COM31','COM32','COM33','COM34','COM35','COM36','COM37','COM38','COM39'] ## com ports for NRF52-DK at SJ
+        serPort = "COM24"  ## Serial port where arduino is connect
     elif facility_a['Facility'] == "Juarez":
         com = ['COM3', 'COM4', 'COM5', 'COM7', 'COM8', 'COM9', 'COM11', 'COM12','COM13','COM14']  ## com ports for NRF52-DK at SJ
         serPort = "COM6"  ## Serial port where arduino is connect

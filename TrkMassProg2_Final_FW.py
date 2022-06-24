@@ -18,6 +18,7 @@ listOfKeys = list()
 listOfKeys2 = list()
 macqrpairs = {} ## initialize mac qr pair dict
 qrorderpairs = {}
+delete_processes = {}
 flashed = False ## initialize DFU status
 fw = '' ## fw to be flash
 
@@ -26,7 +27,7 @@ def scanQRcodes():
     # qrCodes = list(df['QR Code'])
 
     while True:
-        if len(qrCodes) == 10:
+        if len(qrCodes) == 15:
             break
         qr = input("Scan Domino QR Code (enter 'q' when done scanning): ")
         if qr == 'q':
@@ -137,8 +138,8 @@ def sendToArduino(sendStr):
 
 def delete_records(qrs):
     for value in qrs:
-            print('-----------------Deleting recording for {}'.format(value))
-            print(requests.delete("https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + value))
+        print('-----------------Deleting recording for {}'.format(value))
+        print(requests.delete("https://trksbxmanuf.azure-api.net/black-domino/v2/domino-test?qrcode=" + value))
 def get_systest_records(qrs):
     gotten_qrs.clear()
     for qr in qrs:
@@ -158,7 +159,8 @@ def run(on,off,start,finish,delaytime,start_stat=False,stop_stat=False): ## stat
 
     time.sleep(delaytime)
     if stop_stat:
-        for y in range(start,finish):
+        for y in range(
+                start,finish):
             print("Power {} for node {}".format(off,y+1))
 
         print("-----------------------------")
@@ -173,7 +175,7 @@ def databaseSendData(params):
         print('Something went wrong with sending data to MFDB...')
 
 def csv_write(test_data):
-    with open(log_dir+'\\Log' + datetime.today().strftime('%Y%m%d') + '.csv', 'a+', newline='') as csvfile:
+    with open(log_dir+ datetime.today().strftime('%Y%m%d') + '.csv', 'a+', newline='') as csvfile:
         # topfields = ['qrcode','macid','Pass/Fail','RSSI','Failure Reason']
         csvwriter = csv.writer(csvfile)
         # csvwriter.writerow(topfields)
@@ -194,19 +196,19 @@ if __name__ == '__main__':
     if facility_a['Facility'] == "San Jose":
         # com = ['COM9', 'COM10', 'COM12', 'COM13', 'COM14', 'COM15', 'COM16', 'COM18', 'COM19','COM20']  ## com ports for NRF52-DK at SJ
         # serPort = "COM4"  ## Serial port where arduino is connect
-        com = ['COM5','COM6','COM7','COM8']  ## com ports for NRF52-DK at SJ
-        serPort = "COM4"  ## Serial port where arduino is connect
-        log_dir = r"C:\\Users\\TanishGupta\\OneDrive - Trackonomy\\Desktop"
+        com = ['COM5','COM6','COM7','COM8','COM14','COM30','COM31','COM32','COM33','COM34','COM35','COM36','COM37','COM38','COM39']  ## com ports for NRF52-DK at SJ
+        serPort = "COM24"  ## Serial port where arduino is connect
+        log_dir = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop') + "\\Logs"
     elif facility_a['Facility'] == "Juarez":
         com = ['COM3', 'COM4', 'COM5', 'COM7', 'COM8', 'COM9', 'COM11', 'COM12','COM13','COM14']  ## com ports for NRF52-DK at SJ
         serPort = "COM6"  ## Serial port where arduino is connect
-        log_dir = r"C:\\Users\\PRODUCCION ISM\\Desktop\\Logs"
+        log_dir = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop') + "\\Logs"
 
     try:
-        with open(log_dir+'\\Log' + datetime.today().strftime('%Y%m%d') + '.csv', 'r+', newline='') as csvfile:
+        with open(log_dir + datetime.today().strftime('%Y%m%d') + '.csv', 'r+', newline='') as csvfile:
             csv.reader(csvfile)
     except:
-        with open(log_dir+'\\Log' + datetime.today().strftime('%Y%m%d') + '.csv', 'a+', newline='') as csvfile:
+        with open(log_dir + datetime.today().strftime('%Y%m%d') + '.csv', 'a+', newline='') as csvfile:
             topfields = ['qrcode', 'macid', 'Pass/Fail', 'RSSI', 'Failure Reason']
             csvwriter = csv.writer(csvfile)
             csvwriter.writerow(topfields)
@@ -225,6 +227,7 @@ if __name__ == '__main__':
         for x in macids:
             macAddyincr.append(change_mac(x, 1)) ## increment macids by 1 in HEX
         startTime = time.time() ## test start time
+
 
         os.system("cls")
         print("/================================================\\")
@@ -500,7 +503,7 @@ if __name__ == '__main__':
             print(passedmacs)
             print("")
             lines = ["Test # {}".format(counter), '# of Domino(s): {}'.format(len(macids)),'Time taken: {}'.format(endTime),'FW: {}'.format(fw),'###############################'] ## data for loggin
-            with open(log_dir+'\\Log_'+datetime.today().strftime('%Y%m%d')+'.txt', 'a+') as f: ## open txt file to write log to
+            with open(log_dir+datetime.today().strftime('%Y%m%d')+'.txt', 'a+') as f: ## open txt file to write log to
                 for line in lines:
                     f.write(line) ## write the data in log file
                     f.write('\n')
