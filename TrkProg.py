@@ -32,7 +32,7 @@ def scanQRcodes():
 
     previousDupe = False
     while True:
-        if len(qrCodes) == 10:
+        if len(qrCodes) == 15:
             break
         if previousDupe == False:
             qr = input("Scan Domino QR Code (enter 'q' when done scanning): ")
